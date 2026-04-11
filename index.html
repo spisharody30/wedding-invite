@@ -256,11 +256,14 @@
       /* Swap layouts */
       .hero-container       { display: none !important; }
       #heroMobileContent    { display: flex; }
+      /* Prevent horizontal scroll at the scroll-container level so the
+         canvas can extend 120px beyond the hero section on each side. */
+      #pageContainer { overflow-x: hidden; }
       /* Section grows to natural content height */
       #heroSection {
         height: auto !important;
         min-height: 100svh;
-        overflow-x: hidden;
+        /* overflow-x intentionally removed — #pageContainer clips instead */
         align-items: flex-start;
         justify-content: flex-start;
       }
@@ -1593,9 +1596,9 @@
     ════════════════════════════════════════════ */
     #heroMobCurveCanvas {
       position: absolute;
-      left: 0;
+      left: -120px;              /* 120px runway off-screen left  */
       top: 138.81px;
-      width: 100%;
+      width: calc(100% + 240px); /* 120px runway off-screen right */
       height: 454.722px;
       pointer-events: none;
       z-index: 0; /* behind #heroMobileContent (z-index:1) so photo is always in front */
@@ -3417,8 +3420,10 @@
     }
 
     // ── Animation ───────────────────────────────────────────────────────────
-    var SPEED   = 38;  // px per second along the path
-    var FADE_PX = 60;  // fade zone at each end of path (px)
+    var SPEED      = 38;   // px per second along the path
+    var FADE_PX    = 60;   // fade zone at each arc endpoint (px)
+    var MARGIN     = 120;  // canvas overscan beyond each viewport edge (px)
+    var EDGE_FADE  = 60;   // fade zone near visible viewport edges (px)
     var BASE_ALPHA = 0.75;
     var offset  = 0;
     var lastTS  = null;
@@ -3452,12 +3457,19 @@
           var w  = tokWidths[ti];
           var cx = arcPos + w / 2; // arc position of token centre
           if (cx >= 0 && cx <= totLen) {
-            // Fade only within FADE_PX of each path end; full opacity elsewhere
-            var alpha = BASE_ALPHA;
-            if (cx < FADE_PX)            alpha = BASE_ALPHA * (cx / FADE_PX);
-            else if (cx > totLen - FADE_PX) alpha = BASE_ALPHA * ((totLen - cx) / FADE_PX);
-            ctx.globalAlpha = alpha;
             var p = ptAt(cx);
+            // Arc-endpoint fade (path start/end which are off-screen)
+            var arcFade = 1;
+            if (cx < FADE_PX)               arcFade = cx / FADE_PX;
+            else if (cx > totLen - FADE_PX) arcFade = (totLen - cx) / FADE_PX;
+            // Viewport-edge fade: canvas has MARGIN px of off-screen runway on
+            // each side. Fade tokens within EDGE_FADE px of the visible edge.
+            var vpX  = p.x - MARGIN;              // x relative to viewport left
+            var vpW  = cssW - 2 * MARGIN;         // viewport width in canvas coords
+            var xFade = 1;
+            if (vpX < EDGE_FADE)           xFade = Math.max(0, vpX / EDGE_FADE);
+            else if (vpX > vpW - EDGE_FADE) xFade = Math.max(0, (vpW - vpX) / EDGE_FADE);
+            ctx.globalAlpha = BASE_ALPHA * Math.min(arcFade, xFade);
             ctx.save();
             ctx.translate(p.x, p.y);
             ctx.rotate(p.angle);
