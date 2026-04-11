@@ -3593,7 +3593,9 @@
   })();
 
   // ── Background music ─────────────────────────────────────────────────────
-  (function () {
+  // Wrapped in DOMContentLoaded because <audio> and <button> are parsed
+  // after this <script> block in the HTML source.
+  document.addEventListener('DOMContentLoaded', function () {
     'use strict';
 
     var audio  = document.getElementById('bg-music');
@@ -3701,7 +3703,7 @@
 
     // Attempt after a short delay to let the page settle
     setTimeout(attemptAutoplay, 800);
-  })();
+  });
 
 </script>
 
