@@ -1612,9 +1612,9 @@
     #heroTextSvgMob {
       position: absolute;
       left: 0;
-      top: 138.81px;
+      top: 105.5px;
       width: 100%;
-      height: 454.722px;
+      height: 527.983px;
       pointer-events: none;
       z-index: 1;
       overflow: visible;
@@ -1623,49 +1623,8 @@
 
     @media (max-width: 767px) {
       #heroTextSvg    { display: none; }
-      #heroTextSvgMob { display: none; } /* replaced by canvas curved text */
-      .hmq-track      { display: none; } /* replaced by canvas curved text */
-    }
-
-    /* ════════════════════════════════════════════
-       HERO — MOBILE CURVED TEXT (pre-rendered SVG paths)
-       Figma-flattened vector outlines animated with CSS translateX.
-    ════════════════════════════════════════════ */
-    #heroMobCurveWrap {
-      position: absolute;
-      top: 105.5px;
-      left: 0;
-      width: 100%;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: 0; /* behind #heroMobileContent (z-index:1) */
-      display: none;
-      /* Fade edges to transparent (mirrors the old canvas edge-fade) */
-      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-      mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-    }
-    @media (max-width: 767px) {
-      #heroMobCurveWrap { display: block; }
-    }
-    #heroMobCurveTrack {
-      display: flex;
-      width: 300%; /* 3 copies × viewport width */
-      will-change: transform;
-      animation: mobCurveFlow 35s linear infinite;
-    }
-    #heroMobCurveTrack img {
-      flex: 0 0 33.333%;
-      width: 33.333%;
-      height: auto;
-      display: block;
-      opacity: 0.85;
-    }
-    @keyframes mobCurveFlow {
-      from { transform: translateX(0); }
-      to   { transform: translateX(calc(-100% / 3)); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      #heroMobCurveTrack { animation-play-state: paused; }
+      #heroTextSvgMob { display: block; }
+      .hmq-track      { display: none; }
     }
 
     /* Desktop SVG: enable ligatures for Indic scripts */
@@ -1846,18 +1805,16 @@
 
     <!-- Mobile: Vector2 path, Figma node 349:19. Short phrase × 8. -->
     <svg id="heroTextSvgMob"
-         viewBox="0 0 399.627 455.722"
+         viewBox="0 0 398.648 527.983"
          preserveAspectRatio="none"
          xmlns="http://www.w3.org/2000/svg"
          aria-hidden="true">
       <defs>
         <path id="flowCurveMob" fill="none" stroke="none"
-          d="M0.0178479,455.193
-             C0.0178479,455.193 201.518,463.193 201.518,210.693
-             C201.518,-41.8067 399.518,3.69332 399.518,3.69332"/>
+          d="M0.121,527.499 C0.121,527.499 201.621,476.499 201.621,243.999 C201.621,11.499 398.621,0.499 398.621,0.499"/>
 
         <linearGradient id="edgeFadeGMob" gradientUnits="userSpaceOnUse"
-                        x1="0" y1="0" x2="399.627" y2="0">
+                        x1="0" y1="0" x2="398.648" y2="0">
           <stop offset="0%"   stop-color="white" stop-opacity="0"/>
           <stop offset="12%"  stop-color="white" stop-opacity="1"/>
           <stop offset="88%"  stop-color="white" stop-opacity="1"/>
@@ -1866,13 +1823,14 @@
         <mask id="edgeMaskMob" maskUnits="userSpaceOnUse"
               x="-3000" y="-3000" width="6000" height="6000">
           <rect x="-3000" y="-3000" width="6000"    height="6000" fill="black"/>
-          <rect x="0"     y="-3000" width="399.627" height="6000"
+          <rect x="0"     y="-3000" width="398.648" height="6000"
                 fill="url(#edgeFadeGMob)"/>
         </mask>
       </defs>
 
       <text font-family="'Noto Serif Malayalam','Noto Serif Devanagari','Noto Serif',serif"
-            font-size="18" fill="#8B1A1A" letter-spacing="0.8" opacity="0.75"
+            font-size="15" fill="#8B1A1A" letter-spacing="0.8" opacity="0.75"
+            text-rendering="geometricPrecision"
             mask="url(#edgeMaskMob)">
         <textPath href="#flowCurveMob" startOffset="0%">
           <animate attributeName="startOffset"
@@ -1889,15 +1847,6 @@
         </textPath>
       </text>
     </svg>
-
-    <!-- Mobile curved text — Figma-flattened SVG paths, animated translateX -->
-    <div id="heroMobCurveWrap" aria-hidden="true">
-      <div id="heroMobCurveTrack">
-        <img src="images/curved text.svg" alt="">
-        <img src="images/curved text.svg" alt="">
-        <img src="images/curved text.svg" alt="">
-      </div>
-    </div>
 
     <!-- Mobile hero (≤767px) -->
     <div id="heroMobileContent">
@@ -3448,7 +3397,17 @@
     mq.addEventListener('change', e => applyRM(e.matches));
   })();
 
-  // ── Mobile curved text — replaced by CSS-animated SVG image ─────────────
+  // ── Mobile curved text — SVG textPath, reflow after fonts load ──────────
+  document.fonts.ready.then(function() {
+    var svgMob = document.getElementById('heroTextSvgMob');
+    if (svgMob) {
+      // Force reflow so the browser re-measures glyph advances with loaded fonts
+      svgMob.style.display = 'none';
+      // eslint-disable-next-line no-unused-expressions
+      svgMob.getBoundingClientRect();
+      svgMob.style.display = '';
+    }
+  });
 
   // ── Background music ─────────────────────────────────────────────────────
   // Wrapped in DOMContentLoaded because <audio> and <button> are parsed
