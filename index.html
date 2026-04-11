@@ -3688,12 +3688,18 @@
     }
 
     function stopMusic() {
-      fadeOut(function () { setPlaying(false); });
+      clearFade();
+      audio.pause();
+      audio.volume = TARGET_VOL; // reset for next play
+      setPlaying(false);
     }
 
     // ── Toggle button ─────────────────────────────────────────────────────
     btn.addEventListener('click', function () {
-      if (isPlaying) {
+      // Use audio.paused as ground truth — more reliable than isPlaying flag
+      // on mobile Safari where async state can drift.
+      if (!audio.paused) {
+        // Pause synchronously within the user gesture — required on mobile
         stopMusic();
       } else {
         // iOS Safari: play() MUST be called synchronously in a user event
