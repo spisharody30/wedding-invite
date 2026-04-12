@@ -3550,20 +3550,18 @@
 </button>
 
   <script>
-  // ── Music tooltip — first visit only ─────────────────────────────────────
+  // ── Music tooltip ─────────────────────────────────────────────────────────
   (function() {
-    if (localStorage.getItem('musicTooltipShown')) return;
     var tip = document.getElementById('musicTooltip');
     var btn = document.getElementById('musicToggle');
     var hideTimer;
     function hideTip() {
       clearTimeout(hideTimer);
       tip.classList.remove('visible');
-      localStorage.setItem('musicTooltipShown', '1');
     }
     setTimeout(function() {
       tip.classList.add('visible');
-      hideTimer = setTimeout(hideTip, 8000);
+      hideTimer = setTimeout(hideTip, 20000);
     }, 3000);
     btn.addEventListener('click', hideTip, { once: true });
   })();
