@@ -1608,17 +1608,19 @@
 
     /* Styling is on SVG presentation attributes; no override needed here */
 
-    /* Mobile curve SVG — Vector2 path, Figma node 349:19 */
+    /* Mobile curved text — Figma-flattened vector outlines, img element */
     #heroTextSvgMob {
       position: absolute;
       left: 0;
       top: 105.5px;
       width: 100%;
-      height: 527.983px;
+      height: auto;
       pointer-events: none;
       z-index: 1;
-      overflow: visible;
       display: none; /* hidden on desktop */
+      opacity: 0.85;
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
     }
 
     @media (max-width: 767px) {
@@ -1804,49 +1806,7 @@
     </svg>
 
     <!-- Mobile: Vector2 path, Figma node 349:19. Short phrase × 8. -->
-    <svg id="heroTextSvgMob"
-         viewBox="0 0 398.648 527.983"
-         preserveAspectRatio="none"
-         xmlns="http://www.w3.org/2000/svg"
-         aria-hidden="true">
-      <defs>
-        <path id="flowCurveMob" fill="none" stroke="none"
-          d="M0.121,527.499 C0.121,527.499 201.621,476.499 201.621,243.999 C201.621,11.499 398.621,0.499 398.621,0.499"/>
-
-        <linearGradient id="edgeFadeGMob" gradientUnits="userSpaceOnUse"
-                        x1="0" y1="0" x2="398.648" y2="0">
-          <stop offset="0%"   stop-color="white" stop-opacity="0"/>
-          <stop offset="12%"  stop-color="white" stop-opacity="1"/>
-          <stop offset="88%"  stop-color="white" stop-opacity="1"/>
-          <stop offset="100%" stop-color="white" stop-opacity="0"/>
-        </linearGradient>
-        <mask id="edgeMaskMob" maskUnits="userSpaceOnUse"
-              x="-3000" y="-3000" width="6000" height="6000">
-          <rect x="-3000" y="-3000" width="6000"    height="6000" fill="black"/>
-          <rect x="0"     y="-3000" width="398.648" height="6000"
-                fill="url(#edgeFadeGMob)"/>
-        </mask>
-      </defs>
-
-      <text font-family="'Noto Serif Malayalam','Noto Serif Devanagari','Noto Serif',serif"
-            font-size="15" fill="#8B1A1A" letter-spacing="0.8" opacity="0.75"
-            text-rendering="geometricPrecision"
-            mask="url(#edgeMaskMob)">
-        <textPath href="#flowCurveMob" startOffset="0%">
-          <animate attributeName="startOffset"
-                   from="0%" to="-50%"
-                   dur="28s" repeatCount="indefinite" calcMode="linear"/>
-          രണ്ട് ഹൃദയങ്ങൾ, ഒരു പ്രണയം  ✦  दो दिल, एक प्यार  ✦
-          രണ്ട് ഹൃദയങ്ങൾ, ഒരു പ്രണയം  ✦  दो दिल, एक प्यार  ✦
-          രണ്ട് ഹൃദയങ്ങൾ, ഒരു പ്രണയം  ✦  दो दिल, एक प्यार  ✦
-          രണ്ട് ഹൃദയങ്ങൾ, ഒരു പ്രണയം  ✦  दो दिल, एक प्यार  ✦
-          രണ്ട് ഹൃദയങ്ങൾ, ഒരു പ്രണയം  ✦  दो दिल, एक प्यार  ✦
-          രണ്ട് ഹൃദയങ്ങൾ, ഒരു പ്രണയം  ✦  दो दिल, एक प्यार  ✦
-          രണ്ട് ഹൃദയങ്ങൾ, ഒരു പ്രണയം  ✦  दो दिल, एक प्यार  ✦
-          രണ്ട് ഹൃദയങ്ങൾ, ഒരു പ്രണയം  ✦  दो दिल, एक प्यार  ✦
-        </textPath>
-      </text>
-    </svg>
+    <img id="heroTextSvgMob" src="images/curved text.svg" aria-hidden="true" alt="">
 
     <!-- Mobile hero (≤767px) -->
     <div id="heroMobileContent">
@@ -3388,7 +3348,7 @@
   (function() {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     function applyRM(reduced) {
-      document.querySelectorAll('#heroTextSvg animate, #heroTextSvgMob animate').forEach(el => {
+      document.querySelectorAll('#heroTextSvg animate').forEach(el => {
         reduced ? el.pauseAnimations() : el.beginElement();
       });
     }
@@ -3396,18 +3356,6 @@
     applyRM(mq.matches);
     mq.addEventListener('change', e => applyRM(e.matches));
   })();
-
-  // ── Mobile curved text — SVG textPath, reflow after fonts load ──────────
-  document.fonts.ready.then(function() {
-    var svgMob = document.getElementById('heroTextSvgMob');
-    if (svgMob) {
-      // Force reflow so the browser re-measures glyph advances with loaded fonts
-      svgMob.style.display = 'none';
-      // eslint-disable-next-line no-unused-expressions
-      svgMob.getBoundingClientRect();
-      svgMob.style.display = '';
-    }
-  });
 
   // ── Background music ─────────────────────────────────────────────────────
   // Wrapped in DOMContentLoaded because <audio> and <button> are parsed
