@@ -1722,6 +1722,47 @@
     @media (prefers-reduced-motion: reduce) {
       #musicToggle .eq-bars span { animation: none !important; }
     }
+
+    /* ── Music tooltip (speech bubble) ── */
+    #musicTooltip {
+      position: fixed; z-index: 999;
+      background: #ae1919; color: #F5F0E8;
+      font-family: 'Raleway', sans-serif; font-size: 13px;
+      font-weight: 500; letter-spacing: 0.3px;
+      white-space: nowrap; padding: 8px 14px; border-radius: 20px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+      pointer-events: none; opacity: 0; transition: opacity 0.5s ease;
+      /* Desktop default: left of button */
+      bottom: 32px; right: 82px;
+    }
+    #musicTooltip.visible {
+      opacity: 1;
+      animation: tooltipPulse 1.8s ease-in-out 0.5s 2;
+    }
+    @keyframes tooltipPulse {
+      0%,100% { transform: scale(1); }
+      50%     { transform: scale(1.06) translateY(-1px); }
+    }
+    /* Desktop: tail points RIGHT toward button */
+    #musicTooltip::after {
+      content: ''; position: absolute;
+      top: 50%; transform: translateY(-50%);
+      right: -8px; border-style: solid;
+      border-width: 7px 0 7px 8px;
+      border-color: transparent transparent transparent #ae1919;
+    }
+    /* Mobile: above button, tail points DOWN toward button */
+    @media (max-width: 767px) {
+      #musicTooltip { bottom: 72px; right: 8px; }
+      #musicTooltip::after {
+        top: auto; transform: none; right: 22px;
+        bottom: -8px; border-width: 8px 7px 0 7px;
+        border-color: #ae1919 transparent transparent transparent;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #musicTooltip.visible { animation: none; }
+    }
   </style>
 </head>
 <body>
@@ -3484,6 +3525,7 @@
 </audio>
 
 <!-- Music toggle button (fixed bottom-right) -->
+<div id="musicTooltip" role="tooltip" aria-hidden="true">Tap for music ♪</div>
 <button id="musicToggle"
         aria-label="Toggle background music"
         aria-pressed="false"
@@ -3503,5 +3545,24 @@
   </span>
 </button>
 
+  <script>
+  // ── Music tooltip — first visit only ─────────────────────────────────────
+  (function() {
+    if (localStorage.getItem('musicTooltipShown')) return;
+    var tip = document.getElementById('musicTooltip');
+    var btn = document.getElementById('musicToggle');
+    var hideTimer;
+    function hideTip() {
+      clearTimeout(hideTimer);
+      tip.classList.remove('visible');
+      localStorage.setItem('musicTooltipShown', '1');
+    }
+    setTimeout(function() {
+      tip.classList.add('visible');
+      hideTimer = setTimeout(hideTip, 8000);
+    }, 3000);
+    btn.addEventListener('click', hideTip, { once: true });
+  })();
+  </script>
 </body>
 </html>
