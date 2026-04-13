@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rahul &amp; Kashish — 21.06.2026</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" defer></script>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Malayalam:wght@400;500&family=Noto+Serif+Devanagari:wght@400;500&display=swap" rel="stylesheet">
@@ -1627,17 +1628,19 @@
       left: -1px;
       top: 102px;
       width: calc(100% + 1px);
-      height: auto;
+      aspect-ratio: 402.042 / 518.999;
       pointer-events: none;
       z-index: 1;
       display: none;
       overflow: visible;
     }
-    #heroTextSvgMobIos img {
+    #heroTextSvgMobIos .hero-lottie {
       width: 100%;
-      height: auto;
+      height: 100%;
       display: block;
-      opacity: 0.78;
+      opacity: 0.82;
+      animation: heroCurveFallbackDrift 14s linear infinite;
+      transform-origin: center center;
     }
 
     @media (max-width: 767px) {
@@ -1669,6 +1672,11 @@
     @keyframes writeReveal  { to { opacity: 1; clip-path: inset(0 0% 0 0); } }
     @keyframes arcRevealTL  { to { opacity: 1; clip-path: inset(0 0% 0% 0); } }
     @keyframes arcRevealBR  { to { opacity: 1; clip-path: inset(0% 0 0 0%); } }
+    @keyframes heroCurveFallbackDrift {
+      0%   { transform: translateX(-2.5%) translateY(0); }
+      50%  { transform: translateX(2.5%) translateY(-0.8%); }
+      100% { transform: translateX(-2.5%) translateY(0); }
+    }
     @keyframes photoFloat {
       0%, 100% { transform: translateY(0); }
       50%       { transform: translateY(-6px); }
@@ -1920,7 +1928,7 @@
       </text>
     </svg>
     <div id="heroTextSvgMobIos" aria-hidden="true">
-      <img src="images/curved-text-mobile.gif" alt="" />
+      <div id="heroTextLottie" class="hero-lottie"></div>
     </div>
 
     <!-- Mobile hero (≤767px) -->
@@ -3466,12 +3474,29 @@
     if (isIOS && isWebKit) {
       document.documentElement.classList.add('ios-hero-curve-fix');
     }
+    if (isIOS && isWebKit && window.lottie) {
+      var lottieRoot = document.getElementById('heroTextLottie');
+      if (lottieRoot) {
+        window.lottie.loadAnimation({
+          container: lottieRoot,
+          renderer: 'svg',
+          loop: true,
+          autoplay: true,
+          path: 'images/flow2-lottie.json'
+        });
+      }
+    }
 
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     function applyRM(reduced) {
       document.querySelectorAll('#heroTextSvg animate, #heroTextSvgMob animate').forEach(el => {
         reduced ? el.pauseAnimations() : el.beginElement();
       });
+      if (window.lottie) {
+        window.lottie.getRegisteredAnimations().forEach(function(anim) {
+          reduced ? anim.pause() : anim.play();
+        });
+      }
     }
     // Run once after DOM is ready (SVGs already in DOM at this point)
     applyRM(mq.matches);
