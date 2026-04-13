@@ -3474,9 +3474,12 @@
     if (isIOS && isWebKit) {
       document.documentElement.classList.add('ios-hero-curve-fix');
     }
-    if (isIOS && isWebKit && window.lottie) {
-      var lottieRoot = document.getElementById('heroTextLottie');
-      if (lottieRoot) {
+    if (isIOS && isWebKit) {
+      // Lottie script is defer'd — wait for full page load before init
+      window.addEventListener('load', function() {
+        if (!window.lottie) return;
+        var lottieRoot = document.getElementById('heroTextLottie');
+        if (!lottieRoot) return;
         window.lottie.loadAnimation({
           container: lottieRoot,
           renderer: 'svg',
@@ -3484,7 +3487,7 @@
           autoplay: true,
           path: 'images/flow-text-mobile.json'
         });
-      }
+      });
     }
 
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
