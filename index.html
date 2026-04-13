@@ -1633,6 +1633,14 @@
     #heroTextSvgMob text {
       font-feature-settings: "liga" 1, "clig" 1, "calt" 1;
     }
+    /* iOS Safari can mis-render textPath + mask with Indic scripts.
+       Fallback: keep moving text visible without SVG mask fade. */
+    .ios-hero-curve-fix #heroTextSvg text,
+    .ios-hero-curve-fix #heroTextSvgMob text {
+      mask: none !important;
+      -webkit-mask: none !important;
+      opacity: 0.72;
+    }
 
     /* ════════════════════════════════════════════
        ADDITIONAL KEYFRAMES
@@ -1793,6 +1801,7 @@
          viewBox="0 0 1436 507.101"
          preserveAspectRatio="xMidYMid meet"
          xmlns="http://www.w3.org/2000/svg"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
          aria-hidden="true">
       <defs>
 
@@ -1831,7 +1840,7 @@
             font-family="'Noto Serif Malayalam','Noto Serif Devanagari','Noto Serif',serif"
             font-size="22" fill="#8B1A1A" opacity="0.75"
             mask="url(#edgeMask)">
-        <textPath href="#flowCurve" startOffset="0%">
+        <textPath href="#flowCurve" xlink:href="#flowCurve" startOffset="0%">
           <animate attributeName="startOffset"
                    from="-50%" to="0%"
                    dur="40s" repeatCount="indefinite" calcMode="linear"/>
@@ -1845,6 +1854,7 @@
          viewBox="0 0 402.042 518.999"
          preserveAspectRatio="xMidYMid meet"
          xmlns="http://www.w3.org/2000/svg"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
          aria-hidden="true">
       <defs>
 
@@ -1880,7 +1890,7 @@
             font-family="'Noto Serif Malayalam','Noto Serif Devanagari','Noto Serif',serif"
             font-size="16" fill="#8B1A1A" opacity="0.75"
             mask="url(#edgeMaskMob)">
-        <textPath href="#flowCurveMob" startOffset="0%">
+        <textPath href="#flowCurveMob" xlink:href="#flowCurveMob" startOffset="0%">
           <animate attributeName="startOffset"
                    from="-50%" to="0%"
                    dur="40s" repeatCount="indefinite" calcMode="linear"/>
@@ -3423,6 +3433,16 @@
   // Pause SMIL <animate> elements when user prefers reduced motion
   // (CSS media query handles CSS animations; SMIL needs JS)
   (function() {
+    // iOS Safari compatibility: textPath rendering is more stable
+    // when edge mask is removed for the curved hero text.
+    var ua = navigator.userAgent || '';
+    var isIOS = /iP(hone|od|ad)/.test(ua) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    var isWebKit = /WebKit/i.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua);
+    if (isIOS && isWebKit) {
+      document.documentElement.classList.add('ios-hero-curve-fix');
+    }
+
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     function applyRM(reduced) {
       document.querySelectorAll('#heroTextSvg animate, #heroTextSvgMob animate').forEach(el => {
