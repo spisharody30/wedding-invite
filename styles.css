@@ -1,0 +1,1800 @@
+@font-face {
+  font-family: 'Brittany Signature';
+  src: url('fonts/BrittanySignature.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'TAN Mon Cheri';
+  src: url('fonts/tan-mon-cheri.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'SangBleu Sans';
+  src: url('fonts/SangBleuSans-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'SangBleu Sans';
+  src: url('fonts/SangBleuSans-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+      overflow-x: hidden;
+      background: #1a0a0a;
+    }
+
+    /* ── Page container: smooth scroll (JS handles snap on mobile/tablet) ── */
+    #pageContainer {
+      width: 100vw; height: 100vh;
+      overflow-y: scroll;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+    }
+    #pageContainer::-webkit-scrollbar { display: none; }
+
+    /* ── Each section fills the viewport ── */
+    .page-section {
+      width: 100vw; height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── Desktop: free scrolling — remove snap architecture ── */
+    @media (min-width: 1024px) {
+      html, body {
+        height: auto;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+      #pageContainer {
+        height: auto;
+        overflow-y: visible;
+        overflow-x: hidden;
+      }
+      .page-section {
+        height: auto;
+        min-height: 80vh;
+      }
+    }
+
+    /* ── Section backgrounds ── */
+    .section-bg {
+      position: absolute;
+      inset: 0; z-index: 0;
+      overflow: hidden;
+    }
+    .section-bg > img {
+      width: 100%; height: 115%;
+      object-fit: cover; display: block;
+      transform: translateY(0px);
+      will-change: transform;
+    }
+
+    /* ── Reduced motion: disable all animations & parallax ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      #pageContainer { scroll-behavior: auto; }
+      .section-bg > img { will-change: auto; }
+    }
+
+    /* ── Scale roots ── */
+    .scale-root {
+      position: absolute;
+      left: 0; top: 0;
+      transform-origin: top left;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    /* ════════════════════════════════════════════
+       HERO — responsive (all breakpoints)
+    ════════════════════════════════════════════ */
+
+    /* Hero section: flex container so content is truly centered */
+    #heroSection {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Max-width wrapper, centered with padding */
+    .hero-container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 64px 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 48px;
+      overflow: visible; /* allow script font descenders to render freely */
+    }
+
+    /* Title: scales from ~29px at 375px up to 48px at 1440px */
+    .hero-headline {
+      font-family: 'Brittany Signature', cursive;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      color: #000000;
+      text-align: center;
+      line-height: 1.5; /* extra room for Brittany Signature descenders */
+      width: 100%;
+      padding-bottom: 0.4em; /* guard against flourish clipping */
+      opacity: 0; clip-path: inset(0 100% 0 0);
+      animation: writeReveal 0.9s cubic-bezier(0.4,0,0.2,1) 1s forwards;
+    }
+
+    /* Composition row: [Rahul] [photo-grid] [Kashish] */
+    .hero-composition {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(0.75rem, 3vw, 3.5rem);
+      width: 100%;
+    }
+
+    /* Names: max 64px at 1440px per Figma */
+    .hero-name {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: clamp(1.5rem, 4.5vw, 4rem);
+      color: #ae1919;
+      white-space: nowrap;
+      flex-shrink: 0;
+      line-height: normal;
+    }
+    .hero-name--left {
+      opacity: 0; transform: translateX(-80px);
+      animation: slideFromLeft 0.9s cubic-bezier(0.22,1,0.36,1) 2.9s forwards;
+    }
+    .hero-name--right {
+      opacity: 0; transform: translateX(80px);
+      animation: slideFromRight 0.9s cubic-bezier(0.22,1,0.36,1) 2.9s forwards;
+    }
+
+    /* Photo grid: proportional container for brush arcs + oval.
+       Grid dimensions from Figma: 418 × 594 px.
+       All children positioned as % of this box. */
+    .hero-photo-grid {
+      position: relative;
+      width: clamp(200px, 28vw, 420px);
+      aspect-ratio: 418 / 594;
+      flex-shrink: 0;
+    }
+
+    /* Brush arc — top-left (Figma: 206×229.5 at 0,0 in 418×594 grid) */
+    .hero-arc-top {
+      position: absolute;
+      left: 0; top: 0;
+      width: 49.3%; height: 38.6%;
+      overflow: hidden;
+      opacity: 0; animation: arcFadeIn 0.4s ease-out 2.4s forwards;
+    }
+    .hero-arc-top .arc-wipe {
+      position: absolute; inset: 0;
+      clip-path: inset(0 100% 0 0);
+      animation: paintWipe 0.85s cubic-bezier(0.4,0,0.2,1) 2.4s forwards;
+    }
+    .hero-arc-top .arc-wipe img { display: block; width: 100%; height: 100%; max-width: none; }
+
+    /* Brush arc — bottom-right (Figma: 206×238 at left:212,top:356 in 418×594 grid) */
+    .hero-arc-bot {
+      position: absolute;
+      left: 50.7%; top: 59.9%;
+      width: 49.3%; height: 40.1%;
+      overflow: hidden;
+      opacity: 0; animation: arcFadeIn 0.4s ease-out 2.6s forwards;
+    }
+    .hero-arc-bot .arc-wipe {
+      position: absolute; inset: 0;
+      transform: rotate(180deg);
+      clip-path: inset(0 100% 0 0);
+      animation: paintWipe 0.85s cubic-bezier(0.4,0,0.2,1) 2.6s forwards;
+    }
+    .hero-arc-bot .arc-wipe img { display: block; width: 100%; height: 100%; max-width: none; }
+
+    /* Oval photo (Figma: 364×533 at left:27,top:30 in 418×594 grid) */
+    .hero-photo {
+      position: absolute;
+      left: 6.5%; top: 5.1%;
+      width: 87.1%; height: 89.7%;
+      border-radius: 999px; overflow: hidden;
+      opacity: 0; transform: scale(0.8);
+      animation: photoReveal 1.1s cubic-bezier(0.22,1,0.36,1) 1.9s forwards;
+    }
+    .hero-photo img.photo-img {
+      position: absolute; left: 0.06%; top: 0;
+      width: 109.82%; height: 100%;
+      object-fit: cover; max-width: none;
+    }
+
+    /* Date + envelope (Figma: top:419/533=78.6%, left/right:110/364=30.2% of photo) */
+    .hero-date-cta {
+      position: absolute;
+      left: 30.2%; right: 30.2%; top: 78.6%;
+      display: flex; flex-direction: column; align-items: center; gap: 8%;
+    }
+    .hero-date {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: clamp(10px, 1.5vw, 20px);
+      color: #fff; text-align: center; white-space: nowrap; line-height: normal;
+      opacity: 0; animation: gentleFadeIn 1s ease-out 3s forwards;
+    }
+    .hero-envelope {
+      width: 14%; aspect-ratio: 1; position: relative; flex-shrink: 0;
+      opacity: 0;
+      animation: gentleFadeIn 1s ease-out 3.5s forwards, pulse 2.2s ease-in-out 4.6s infinite;
+    }
+    .hero-envelope img {
+      position: absolute; top: 0; bottom: -68.97%; left: -34.48%; right: -34.48%;
+      width: calc(100% + 68.96%); height: calc(100% + 68.97%); max-width: none; display: block;
+    }
+
+    /* ════════════════════════════════════════════
+       HERO — TABLET layout (768–1100px)
+       Shrink names + photo so composition fits in 100vw
+    ════════════════════════════════════════════ */
+    @media (min-width: 768px) and (max-width: 1100px) {
+      .hero-name {
+        font-size: clamp(1.5rem, 3.5vw, 2.5rem); /* smaller than desktop */
+      }
+      .hero-photo-grid {
+        width: clamp(180px, 24vw, 320px); /* tighter photo */
+      }
+      .hero-composition {
+        gap: clamp(0.5rem, 2vw, 2rem); /* tighter gap */
+      }
+      .hero-container {
+        padding: 48px 1.5rem; /* slightly less vertical padding on tablet */
+      }
+    }
+
+    /* ════════════════════════════════════════════
+       HERO — MOBILE layout (shown ≤ 767px)
+    ════════════════════════════════════════════ */
+    #heroMobileContent { display: none; }
+
+    @media (max-width: 767px) {
+      /* Swap layouts */
+      .hero-container       { display: none !important; }
+      #heroMobileContent    { display: flex; }
+      /* Prevent horizontal scroll at the scroll-container level so the
+         canvas can extend 120px beyond the hero section on each side. */
+      #pageContainer { overflow-x: hidden; }
+      /* Section grows to natural content height */
+      #heroSection {
+        height: auto !important;
+        min-height: 100svh;
+        /* overflow-x intentionally removed — #pageContainer clips instead */
+        align-items: flex-start;
+        justify-content: flex-start;
+      }
+    }
+
+    /* Mobile hero shell */
+    #heroMobileContent {
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 36px 12px;
+      width: 100%;
+      position: relative; z-index: 1;
+    }
+
+    /* Title */
+    .hero-mob-headline {
+      font-family: 'Brittany Signature', cursive;
+      font-size: 32px; color: #000000;
+      text-align: center; line-height: 1.5;
+      width: 288px; padding-bottom: 0.4em;
+      flex-shrink: 0;
+      opacity: 0; clip-path: inset(0 100% 0 0);
+      animation: writeReveal 0.9s cubic-bezier(0.4,0,0.2,1) 0.4s forwards;
+    }
+
+    /* Inner group: photo + date+arrow */
+    .hero-mob-body {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 36px;
+    }
+
+    /* Photo composition — CSS grid overlap (exact Figma dimensions) */
+    .hero-mob-photo {
+      display: inline-grid;
+      grid-template-columns: max-content; grid-template-rows: max-content;
+      line-height: 0; place-items: start; flex-shrink: 0;
+    }
+    .hero-mob-arc-tl {
+      grid-column: 1; grid-row: 1;
+      width: 157.703px; height: 175.694px;
+      margin-left: 0; margin-top: 0;
+      overflow: hidden; position: relative;
+      opacity: 0; clip-path: inset(0 100% 100% 0);
+      animation: arcRevealTL 0.85s cubic-bezier(0.4,0,0.2,1) 1s forwards;
+    }
+    .hero-mob-arc-br {
+      grid-column: 1; grid-row: 1;
+      width: 157.703px; height: 182.201px;
+      margin-left: 162.3px; margin-top: 272.54px;
+      transform: rotate(180deg);
+      overflow: hidden; position: relative;
+      opacity: 0; clip-path: inset(100% 0 0 100%);
+      animation: arcRevealBR 0.85s cubic-bezier(0.4,0,0.2,1) 1.1s forwards;
+    }
+    .hero-mob-oval {
+      grid-column: 1; grid-row: 1;
+      width: 278.66px; height: 408.038px;
+      margin-left: 20.67px; margin-top: 22.97px;
+      border-radius: 764.785px; overflow: hidden; position: relative;
+      opacity: 0; transform: scale(0.88);
+      animation: photoReveal 1.1s cubic-bezier(0.22,1,0.36,1) 0.7s forwards;
+    }
+    .hero-mob-arc-tl img, .hero-mob-arc-br img {
+      position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; display: block;
+    }
+    .hero-mob-oval img {
+      position: absolute; left: 0.06%; top: 0;
+      width: 109.82%; height: 100%; max-width: none; display: block;
+      object-fit: cover;
+    }
+
+    /* Date + arrow row */
+    .hero-mob-cta {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 8px;
+      opacity: 0; animation: gentleFadeIn 0.9s ease-out 1.6s forwards;
+    }
+    .hero-mob-date {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 20px; color: #1a1a1a;
+      text-align: center; line-height: normal; white-space: nowrap;
+    }
+    .hero-mob-arrow {
+      width: 48px; height: 48px; display: block; flex-shrink: 0;
+      animation: arrowBounce 1.3s ease-in-out 2.4s infinite;
+    }
+
+    /* ════════════════════════════════════════════
+       INVITATION SECTION — desktop (1440 × 1024)
+    ════════════════════════════════════════════ */
+    #invDesktopRoot { width: 1440px; height: 1024px; }
+
+    /* Background texture — full screen cover */
+    .inv-bg-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; max-width: none; display: block;
+    }
+
+    /* ── Full-section layout: flex-col, vertically centered ── */
+    .inv-layout {
+      position: absolute;
+      top: 50%; left: 0; width: 1440px;
+      transform: translateY(-50%);
+      display: flex; flex-direction: column;
+      align-items: center;
+      padding-top: 48px; padding-bottom: 88px;
+    }
+
+    /* ── Kolam border strips: fade in on .inv-show ── */
+    .inv-border {
+      display: flex; gap: 11.542px;
+      align-items: flex-start;
+      width: 100%; flex-shrink: 0;
+      margin-bottom: -40px;
+      opacity: 0; transition: opacity 0.8s ease;
+    }
+    .inv-border.inv-show { opacity: 1; }
+    .inv-border-flip { transform: scaleY(-1); }
+
+    /* Border tile elements */
+    .inv-b-big   { width: 157.805px; height: 157.228px; position: relative; flex-shrink: 0; }
+    .inv-b-curl  { width:  67.946px; height:  67.32px;  position: relative; flex-shrink: 0; }
+    .inv-b-diamond { width: 87.533px; height: 87.533px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .inv-b-diamond-inner { width: 62.219px; height: 61.571px; position: relative; transform: rotate(135deg); }
+    .inv-b-mirror { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .inv-b-mirror-inner { width: 67.946px; height: 67.32px; position: relative; transform: rotate(180deg) scaleY(-1); }
+    .inv-b-big img, .inv-b-curl img, .inv-b-diamond-inner img, .inv-b-mirror-inner img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; max-width: none; display: block;
+    }
+
+    /* ── Cards row ── */
+    .inv-cards-row {
+      display: flex; gap: 34.626px;
+      align-items: center; flex-shrink: 0;
+      margin-bottom: -40px;
+    }
+
+    /* ── Hover wrapper — lift effect separate from entrance anim ── */
+    .inv-card-wrap {
+      cursor: pointer;
+      transition: transform 0.35s ease, filter 0.35s ease;
+    }
+    .inv-card-wrap:hover {
+      transform: translateY(-12px);
+      filter: drop-shadow(0 18px 28px rgba(0,0,0,0.38));
+    }
+
+    /* ── Card base: all start hidden ── */
+    .inv-card {
+      width: 400.123px; height: 615.574px;
+      border-radius: 960.873px;
+      border: 1.924px solid #873f3a;
+      overflow: hidden; position: relative;
+      box-shadow: 0 7.695px 38.473px rgba(0,0,0,0.5);
+      opacity: 0;
+      transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22,1,0.36,1);
+    }
+    .inv-card--thick { border-width: 4.809px; }
+    .inv-card--soft  { box-shadow: 0 7.695px 19.237px rgba(0,0,0,0.5); }
+
+    /* Directional entrance states */
+    .inv-card-center { transform: scale(0.9) translateY(20px); }
+    .inv-card-center.inv-show { opacity: 1; transform: none; }
+    .inv-card-left   { transform: translateX(-80px); }
+    .inv-card-left.inv-show   { opacity: 1; transform: none; }
+    .inv-card-right  { transform: translateX(80px); }
+    .inv-card-right.inv-show  { opacity: 1; transform: none; }
+
+    .inv-card-bg {
+      position: absolute; inset: 0;
+      border-radius: 960.873px; background: #F8F4EC; overflow: hidden;
+    }
+    .inv-card-bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* ── Ornaments: fade+scale in ── */
+    .inv-orn {
+      flex-shrink: 0; position: relative;
+      opacity: 0; transform: scale(0.75);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1);
+    }
+    .inv-orn img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; display: block; }
+    .inv-orn.inv-show { opacity: 1; transform: scale(1); }
+
+    .inv-orn-flipped {
+      flex-shrink: 0; position: relative;
+      opacity: 0; transform: rotate(180deg) scale(0.75);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1);
+    }
+    .inv-orn-flipped img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; display: block; }
+    .inv-orn-flipped.inv-show { opacity: 1; transform: rotate(180deg) scale(1); }
+
+    /* Center card mandala — fades in then pulses golden glow */
+    .inv-orn-mandala {
+      flex-shrink: 0; position: relative;
+      opacity: 0; transition: opacity 0.7s ease;
+    }
+    .inv-orn-mandala img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; display: block; }
+    .inv-orn-mandala.inv-show {
+      opacity: 1;
+      animation: invGoldenGlow 2.8s ease-in-out 0.4s infinite alternate;
+    }
+    @keyframes invGoldenGlow {
+      from { filter: drop-shadow(0 0 2px rgba(180,130,0,0.15)); }
+      to   { filter: drop-shadow(0 0 12px rgba(210,160,0,0.6)); }
+    }
+
+    /* ── Rahul card ── */
+    .rahul-inner {
+      position: absolute;
+      left: 52.9px; top: 41.36px; width: 284.703px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 134.657px;
+    }
+    .rahul-name-block {
+      height: 180.657px; width: 284.703px; flex-shrink: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px;
+    }
+
+    /* ── Wedding details card ── */
+    .wedding-inner {
+      position: absolute;
+      left: 26.93px; top: 29.82px; width: 342.413px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 47.13px;
+    }
+    .wedding-details {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 61.557px;
+      color: #ae1919; text-align: center; width: 100%;
+    }
+
+    /* Animated text elements */
+    .wedding-invited {
+      font-family: 'Raleway', sans-serif; font-weight: 600;
+      font-size: 15.389px; letter-spacing: 1.5389px;
+      text-transform: uppercase; line-height: 1.5;
+      color: #ae1919; width: 260.657px;
+      opacity: 0; transition: opacity 0.8s ease;
+    }
+    .wedding-invited.inv-show { opacity: 1; }
+
+    .wedding-date-block {
+      display: inline-grid;
+      grid-template-columns: max-content; grid-template-rows: max-content;
+      place-items: start; white-space: nowrap; line-height: 0;
+    }
+    .wedding-date-on {
+      grid-column: 1; grid-row: 1;
+      margin-left: 155.82px;
+      font-family: 'Raleway', sans-serif; font-weight: 600;
+      font-size: 11.542px; letter-spacing: 1.1542px;
+      text-transform: uppercase; line-height: 1.5; color: #ae1919;
+      opacity: 0; transition: opacity 0.6s ease;
+    }
+    .wedding-date-on.inv-show { opacity: 1; }
+
+    .wedding-date {
+      grid-column: 1; grid-row: 1;
+      margin-top: 34.63px;
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 34.626px; letter-spacing: 3.4626px;
+      line-height: 1.5; color: #ae1919;
+      opacity: 0; transform: scale(0.82);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1);
+    }
+    .wedding-date.inv-show { opacity: 1; transform: scale(1); }
+
+    .wedding-venue {
+      font-family: 'Raleway', sans-serif; font-weight: 600;
+      text-transform: uppercase; text-align: center;
+      color: #ae1919; line-height: 0;
+      opacity: 0; transition: opacity 0.8s ease;
+    }
+    .wedding-venue.inv-show { opacity: 1; }
+    .wedding-venue-name { font-size: 19.237px; letter-spacing: 2.0776px; line-height: 2; display: block; }
+    .wedding-venue-loc  { font-size: 11.542px; letter-spacing: 2.0776px; line-height: 2; display: block; }
+
+    /* ── Map link icon (shared across all venue mentions) ── */
+    .venue-map-link {
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
+      margin-left: 6px;
+      color: inherit;
+      text-decoration: none;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .venue-map-link:hover  { transform: scale(1.15); opacity: 0.75; }
+    .venue-map-link:active { transform: scale(0.9); }
+    .venue-map-link:focus-visible { outline: 2px solid #ae1919; outline-offset: 2px; border-radius: 2px; }
+    .venue-map-icon { width: 18px; height: 18px; display: block; }
+    @media (max-width: 767px) { .venue-map-icon { width: 20px; height: 20px; } }
+
+    /* ── Kashish card ── */
+    .kashish-inner {
+      position: absolute;
+      left: 38.47px; top: 44.24px; width: 318.367px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 141.39px;
+    }
+    .kashish-name-block {
+      height: 167.191px; width: 319px; flex-shrink: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px;
+    }
+
+    /* ── Shared text ── */
+    .person-name {
+      font-family: 'TAN Mon Cheri', serif;
+      color: #ae1919; line-height: normal;
+      text-align: center; white-space: nowrap;
+    }
+    .person-parentage {
+      font-family: 'Raleway', sans-serif; font-weight: 600;
+      font-size: 13px; color: #ae1919;
+      text-align: center; letter-spacing: 1.5389px;
+      text-transform: uppercase; line-height: 1.5;
+    }
+
+    /* ── Mobile invitation: 402×940 scale-root canvas ── */
+    #invMobileRoot {
+      display: none;
+      width: 402px; height: 940px;
+      position: absolute; z-index: 1; overflow: hidden;
+      transform-origin: top left;
+    }
+
+    /* Background: wide panoramic texture crop (Figma offsets) */
+    .imob-bg {
+      position: absolute; inset: 0; overflow: hidden;
+    }
+    .imob-bg img {
+      position: absolute;
+      width: 322.08%; height: 107.39%;
+      left: -111.04%; top: -3.67%;
+      max-width: none; display: block;
+    }
+
+    /* Main layout column: vertically centered in canvas */
+    .imob-layout {
+      position: absolute;
+      top: 50%; left: 0; width: 402px;
+      transform: translateY(-50%);
+      display: flex; flex-direction: column;
+      align-items: center;
+      padding-bottom: 40px;
+    }
+
+    /* Kolam border strips */
+    .imob-border-top {
+      display: flex; gap: 8.218px;
+      align-items: flex-start;
+      width: 100%; flex-shrink: 0;
+      margin-bottom: -40px;
+      opacity: 0; transition: opacity 0.8s ease;
+    }
+    .imob-border-top.inv-show { opacity: 1; }
+
+    .imob-border-bot-wrap {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; flex-shrink: 0; margin-bottom: -40px;
+    }
+    .imob-border-bot {
+      transform: scaleY(-1); width: 100%;
+      display: flex; gap: 8.218px; align-items: flex-start;
+      opacity: 0; transition: opacity 0.8s ease;
+    }
+    .imob-border-bot.inv-show { opacity: 1; }
+
+    /* Border tile elements (Figma exact sizes) */
+    .imob-b-big    { width: 108.064px; height: 107.669px; position: relative; flex-shrink: 0; }
+    .imob-b-curl   { width: 46.53px;   height: 46.1px;   position: relative; flex-shrink: 0; }
+    .imob-b-diamond { width: 59.942px; height: 59.942px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .imob-b-diamond-i { width: 42.607px; height: 42.164px; position: relative; transform: rotate(135deg); }
+    .imob-b-mirror  { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .imob-b-mirror-i  { width: 46.53px; height: 46.1px; position: relative; transform: rotate(180deg) scaleY(-1); }
+    .imob-b-big img, .imob-b-curl img, .imob-b-diamond-i img, .imob-b-mirror-i img {
+      position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; display: block;
+    }
+
+    /* Single main card: 354×674px */
+    .imob-card {
+      width: 354px; height: 674px;
+      border-radius: 170px;
+      border: 3px solid #873f3a;
+      overflow: hidden; position: relative; flex-shrink: 0;
+      background: #F8F4EC;
+      box-shadow: 0 6.923px 34.615px rgba(0,0,0,0.5);
+      margin-bottom: -40px;
+      opacity: 0; transform: scale(0.92) translateY(24px);
+      transition: opacity 1s ease, transform 1s cubic-bezier(0.22,1,0.36,1);
+    }
+    .imob-card.inv-show { opacity: 1; transform: none; }
+    .imob-card-bg { position: absolute; inset: 0; overflow: hidden; border-radius: 170px; }
+    .imob-card-bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* Card inner: centered — outer gap between mandala / content block / ornament */
+    .imob-inner {
+      position: absolute;
+      left: 50%; top: calc(50% - 0.14px);
+      transform: translate(-50%, -50%);
+      display: flex; flex-direction: column;
+      gap: 48px; align-items: center;
+      width: 300px;
+    }
+
+    /* Inner content block: invited text, names-group, date, venue */
+    .imob-content {
+      display: flex; flex-direction: column;
+      gap: 36px; align-items: center;
+      width: 100%;
+    }
+
+    /* Names group: Rahul block + "and" + Kashish block (Figma gap-24px) */
+    .imob-names-group {
+      display: flex; flex-direction: column;
+      gap: 24px; align-items: center;
+      width: 100%;
+    }
+
+    /* Mandala ornament */
+    .imob-mandala {
+      width: 36.001px; height: 44.167px;
+      position: relative; flex-shrink: 0;
+      opacity: 0; transition: opacity 0.7s ease;
+    }
+    .imob-mandala img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; display: block; }
+    .imob-mandala.inv-show {
+      opacity: 1;
+      animation: invGoldenGlow 2.8s ease-in-out 0.4s infinite alternate;
+    }
+
+    /* Invited text */
+    .imob-invited {
+      font-family: 'Raleway', sans-serif; font-weight: 600;
+      font-size: 12px; letter-spacing: 1.2px;
+      text-transform: uppercase; line-height: 1.5;
+      color: #ae1919; text-align: center; width: 100%;
+      flex-shrink: 0;
+      opacity: 0; transition: opacity 0.7s ease;
+    }
+    .imob-invited.inv-show { opacity: 1; }
+
+    /* Names block: small gap between parentage and name text */
+    .imob-names {
+      display: flex; flex-direction: column;
+      align-items: center; flex-shrink: 0;
+      gap: 8px;
+      width: 100%;
+    }
+    .imob-name {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 36px; color: #ae1919;
+      line-height: normal; text-align: center;
+      white-space: nowrap;
+      opacity: 0; transform: translateY(12px);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.22,1,0.36,1);
+    }
+    .imob-name.inv-show { opacity: 1; transform: none; }
+    .imob-parentage {
+      font-family: 'Raleway', sans-serif; font-weight: 600;
+      font-size: 10px; letter-spacing: 1px;
+      text-transform: uppercase; line-height: 1.5;
+      color: #ae1919; text-align: center;
+      opacity: 0; transition: opacity 0.6s ease;
+    }
+    .imob-parentage.inv-show { opacity: 1; }
+
+    /* Script "and" between names */
+    .imob-and {
+      font-family: 'Brittany Signature', cursive;
+      font-size: 24px; line-height: 1;
+      color: #ae1919; text-align: center;
+      white-space: nowrap; flex-shrink: 0;
+      opacity: 0; transition: opacity 0.7s ease;
+    }
+    .imob-and.inv-show { opacity: 1; }
+
+    /* Date block */
+    .imob-date-block {
+      display: inline-grid;
+      grid-template-columns: max-content; grid-template-rows: max-content;
+      place-items: start; white-space: nowrap; line-height: 0;
+      flex-shrink: 0;
+    }
+    .imob-date-on {
+      grid-column: 1; grid-row: 1;
+      margin-left: 107.19px;
+      font-family: 'Raleway', sans-serif; font-weight: 600;
+      font-size: 10px; letter-spacing: 1px;
+      text-transform: uppercase; line-height: 1.5; color: #ae1919;
+      opacity: 0; transition: opacity 0.6s ease;
+    }
+    .imob-date-on.inv-show { opacity: 1; }
+    .imob-date {
+      grid-column: 1; grid-row: 1;
+      margin-top: 23px;
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 24px; letter-spacing: 2.4px;
+      line-height: 1.5; color: #ae1919;
+      opacity: 0; transform: scale(0.85);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1);
+    }
+    .imob-date.inv-show { opacity: 1; transform: scale(1); }
+
+    /* Venue */
+    .imob-venue {
+      font-family: 'Raleway', sans-serif; font-weight: 600;
+      text-transform: uppercase; text-align: center;
+      color: #ae1919; line-height: 0; flex-shrink: 0;
+      opacity: 0; transition: opacity 0.7s ease;
+    }
+    .imob-venue.inv-show { opacity: 1; }
+    .imob-venue-name { font-size: 16px; letter-spacing: 1.8692px; line-height: 1.5; display: block; }
+    .imob-venue-loc  { font-size: 10px;  letter-spacing: 1.8692px; line-height: 1.5; display: block; }
+
+    /* Bottom ornament */
+    .imob-orn-bot {
+      width: 72.692px; height: 32.885px;
+      position: relative; flex-shrink: 0;
+      transform: rotate(180deg) scale(0.8);
+      opacity: 0; transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1);
+    }
+    .imob-orn-bot img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; display: block; }
+    .imob-orn-bot.inv-show { opacity: 1; transform: rotate(180deg) scale(1); }
+
+    @media (max-width: 767px) {
+      #invDesktopRoot { display: none !important; }
+      #invMobileRoot  { display: block !important; }
+    }
+
+    /* Section 3 grows with its content — height set by JS, no overflow clip */
+    #invitationSection {
+      height: auto;
+      overflow: visible;
+    }
+
+    #functionSection {
+      height: auto;
+      overflow: visible;
+    }
+
+    /* ════════════════════════════════════════════
+       FUNCTION DETAILS (section 3) — 1440×1550 canvas
+    ════════════════════════════════════════════ */
+
+    /* Background lives OUTSIDE the scale-root, fills viewport natively */
+    .func-bg-wrap {
+      position: absolute; inset: 0; overflow: hidden;
+    }
+    .func-bg-wrap img {
+      position: absolute;
+      width: 139.68%; height: 100.34%;
+      left: -19.84%; top: 0;
+      max-width: none; display: block;
+    }
+
+    #funcDesktopRoot {
+      width: 1440px; height: 1550px;
+      transform-origin: top left;
+    }
+
+    /* Event cards */
+    .func-card-pos {
+      position: absolute;
+      width: 492px; height: 665px;
+      opacity: 0;
+      transform: translateY(40px) scale(0.95);
+      transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .func-card-pos--from-left  { transform: translateY(40px) scale(0.95); }
+    .func-card-pos--from-right { transform: translateY(40px) scale(0.95); }
+    .func-card-pos.func-show   { opacity: 1; transform: translateY(0) scale(1); }
+
+    .func-card {
+      width: 100%; height: 100%;
+      /* no CSS border — replaced by SVG brush stroke overlay */
+      border-radius: 0 200px 0 200px; /* keep for overflow clipping */
+      overflow: hidden; position: relative;
+    }
+    .func-card--alt { border-radius: 200px 0 200px 0; }
+
+    /* Brush stroke border overlay — sits on top of card, pointer-events off */
+    .func-card-border {
+      position: absolute; inset: 0;
+      width: 492px; height: 665px;
+      pointer-events: none; z-index: 2;
+      overflow: visible;
+    }
+    .func-border-path {
+      fill: none;
+      stroke: #ae1919;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Card inner: 35px inset on all sides */
+    .func-card-inner {
+      position: absolute;
+      left: 37.5px; top: 37.5px; width: 412px; height: 585px;
+      display: flex; flex-direction: column; gap: 128px;
+    }
+
+    /* Title block */
+    .func-title { flex-shrink: 0; }
+    .func-event-name {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 48px; color: #ae1919; line-height: normal;
+    }
+    .func-event-meta {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 20px; color: #ae1919;
+      line-height: 1.5; letter-spacing: 2px;
+    }
+
+    /* Body text */
+    .func-body {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 20px; color: #ae1919;
+      line-height: 1.5; flex-shrink: 0;
+    }
+
+    /* Venue block: flex-1, content centered, right-aligned by default */
+    .func-venue {
+      flex: 1 0 0; display: flex;
+      flex-direction: column; align-items: flex-end; justify-content: center;
+    }
+    .func-venue-name {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 24px; color: #ae1919; line-height: 2;
+    }
+    .func-venue-addr {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 12px; color: #ae1919; line-height: 2;
+    }
+    /* Reception venue is left-aligned */
+    .func-venue--left { align-items: flex-start; }
+    .func-venue--left .func-venue-addr { letter-spacing: 1.2px; }
+    /* Reception card: right-align title + body */
+    .func-card-inner--right .func-title,
+    .func-card-inner--right .func-body { text-align: right; }
+    /* Reception gap */
+    .func-card-inner--right { gap: 131px; }
+
+    /* Decorative ornament — top-right of canvas */
+    .func-orn {
+      position: absolute; left: 1004px; top: 0;
+      display: flex; align-items: flex-start;
+      opacity: 0; transform: translateY(-40px);
+      transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22,1,0.36,1);
+    }
+    .func-orn.func-show { opacity: 1; transform: none; }
+    .func-orn-a { width: 137.144px; height: 218.199px; position: relative; flex-shrink: 0; }
+    .func-orn-b { width: 137.144px; height: 354.199px; position: relative; flex-shrink: 0; }
+    .func-orn-a img, .func-orn-b img {
+      position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; display: block;
+    }
+
+    /* Script quote text */
+    .func-script {
+      position: absolute; left: 767px; top: 354px; width: 295px;
+      font-family: 'Brittany Signature', cursive;
+      font-size: 36px; color: #ae1919; line-height: 1.5;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22,1,0.36,1);
+    }
+    .func-script.func-show { opacity: 1; transform: none; }
+
+    /* ════════════════════════════════════════════
+       FUNCTION DETAILS — mobile (402 wide, height auto)
+    ════════════════════════════════════════════ */
+    #funcMobileRoot {
+      display: none;
+      width: 402px;
+      position: absolute; top: 0; left: 0;
+      transform-origin: top left;
+      z-index: 1;
+    }
+    @media (max-width: 767px) {
+      #funcDesktopRoot { display: none !important; }
+      #funcMobileRoot  { display: block !important; position: relative !important; }
+      #functionSection { overflow-x: hidden !important; overflow-y: hidden !important; height: auto !important; }
+    }
+
+    /* Background */
+    .fmob-bg {
+      position: absolute; left: -265.28%; top: 0;
+      width: 630.56%; height: 116.14%;
+      pointer-events: none;
+    }
+    .fmob-bg img { display: block; width: 100%; height: 100%; max-width: none; }
+
+    /* Main flex-wrap container: quote + ornaments in row 1, cards in row 2 */
+    .fmob-main {
+      position: relative; z-index: 1;
+      margin-left: 40px;
+      width: 351px;
+      padding-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 36px 44px;
+      align-items: flex-start;
+    }
+
+    /* Script quote wrapper — sits next to ornaments */
+    .fmob-script-wrap {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 174px;
+      padding-top: 36px;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22,1,0.36,1);
+    }
+    .fmob-script-wrap.func-show { opacity: 1; transform: none; }
+    .fmob-script {
+      width: 195px;
+      font-family: 'Brittany Signature', cursive;
+      font-size: 32px; color: #ae1919; line-height: 1.2;
+    }
+
+    /* Ornaments — sits next to quote */
+    .fmob-orn {
+      flex-shrink: 0;
+      display: flex; align-items: flex-start;
+      opacity: 0; transform: translateY(-30px);
+      transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22,1,0.36,1);
+    }
+    .fmob-orn.func-show { opacity: 1; transform: none; }
+    .fmob-orn-a { width: 56px; height: 89.097px; position: relative; flex-shrink: 0; }
+    .fmob-orn-b { width: 56px; height: 144.629px; position: relative; flex-shrink: 0; }
+    .fmob-orn-a img, .fmob-orn-b img {
+      position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; display: block;
+    }
+
+    /* Cards column — full row below quote + ornaments */
+    .fmob-cards {
+      flex-shrink: 0;
+      width: 320px;
+      display: flex; flex-direction: column;
+      gap: 36px;
+    }
+
+    /* Card wrapper (animation target) */
+    .fmob-card-wrap {
+      flex-shrink: 0;
+      opacity: 0;
+      transform: translateY(40px) scale(0.95);
+      transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .fmob-card-wrap.func-show { opacity: 1; transform: translateY(0) scale(1); }
+
+    /* Card: TR + BL rounded */
+    .fmob-card {
+      width: 100%; height: 432.52px;
+      border: 1.6px solid #ae1919;
+      border-radius: 0 100px 0 100px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 6.504px 13.008px rgba(0,0,0,0.25);
+    }
+
+    /* Card inner content */
+    .fmob-inner {
+      position: absolute;
+      left: 25.22px; top: 25.22px;
+      width: 267.967px; height: 380.488px;
+      display: flex; flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Event name */
+    .fmob-name {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 32px; color: #ae1919; line-height: normal;
+    }
+    /* Date / time */
+    .fmob-meta {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 14px; color: #ae1919;
+      line-height: 1.5; letter-spacing: 1.4px;
+    }
+    /* Description */
+    .fmob-body {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 14px; color: #ae1919; line-height: 1.5;
+    }
+    /* Venue — right-aligned */
+    .fmob-venue { text-align: right; }
+    .fmob-venue-name {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 16px; color: #ae1919; line-height: 2;
+    }
+    .fmob-venue-addr {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 8px; color: #ae1919; line-height: 2;
+    }
+    .fmob-venue-addr--spaced { letter-spacing: 0.8px; }
+
+    /* ════════════════════════════════════════════
+       GALLERY — 3D PERSPECTIVE CAROUSEL
+    ════════════════════════════════════════════ */
+    #gallerySection {
+      height: auto;
+      overflow: hidden;
+      background: #f0ebe0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 56px 0;
+    }
+
+    /* ── Outer stage: visible overflow so shadows aren't clipped ── */
+    #c3dCarousel {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+    }
+
+    /* ── Inner clip: hides horizontal overflow (off-screen tilted slides)
+          while letting vertical overflow (shadows, heart) show through.
+          overflow-x: clip is used instead of hidden because hidden + visible
+          on the other axis is invalid CSS — the browser promotes visible→auto.
+          clip clips without creating a scroll container. ── */
+    #c3dClip {
+      position: relative;
+      width: 100%;
+      height: calc(300px * 4 / 3);
+      overflow-x: clip;
+      overflow-y: visible;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── 3D viewport: perspective origin ── */
+    #c3dViewport {
+      position: relative;
+      width: 100%; height: 100%;
+      perspective: 1500px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+    }
+    #c3dViewport.dragging { cursor: grabbing; }
+
+    /* ── Each slide: absolutely centred, transforms applied by JS ── */
+    .c3d-slide {
+      position: absolute;
+      width: 300px;
+      aspect-ratio: 3 / 4;
+      will-change: transform, opacity, filter;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* ── Inner frame: rounded corners + shadow, clips img ── */
+    .c3d-frame {
+      width: 100%; height: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07);
+      transition: box-shadow 0.6s ease-out;
+    }
+    .c3d-slide.is-center .c3d-frame {
+      box-shadow: 0 22px 64px rgba(0,0,0,0.26), 0 4px 16px rgba(0,0,0,0.1);
+    }
+    .c3d-frame img {
+      display: block;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 18px;
+      pointer-events: none;
+      draggable: false;
+    }
+
+    /* ── Heart button ── */
+    .c3d-heart {
+      position: absolute;
+      bottom: 14px; left: 50%;
+      transform: translateX(-50%);
+      width: 36px;
+      background: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 5px 8px 4px;
+      cursor: pointer;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 1px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+      z-index: 5;
+    }
+    .c3d-slide.is-center .c3d-heart {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .c3d-heart-svg { width: 16px; height: 16px; display: block; flex-shrink: 0; }
+    .c3d-heart-path { transition: fill 0.2s ease; }
+    .c3d-heart.liked .c3d-heart-path { fill: #8B1A1A; }
+    .c3d-heart-count {
+      font-family: 'Raleway', sans-serif;
+      font-size: 8px; font-weight: 700;
+      color: #8B1A1A; line-height: 1; display: block;
+    }
+    @keyframes heartPop {
+      0%   { transform: translateX(-50%) scale(1); }
+      40%  { transform: translateX(-50%) scale(1.35); }
+      70%  { transform: translateX(-50%) scale(0.92); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+    .c3d-heart.popping { animation: heartPop 0.38s cubic-bezier(0.22,1,0.36,1); }
+
+    /* ── Floating heart particles ── */
+    .c3d-particle {
+      position: absolute;
+      bottom: 50px; left: 50%;
+      font-size: 10px; line-height: 1;
+      color: #8B1A1A;
+      pointer-events: none;
+      animation: c3dParticleRise 0.9s ease-out forwards;
+      z-index: 10;
+    }
+    @keyframes c3dParticleRise {
+      0%   { opacity: 1; transform: translate(var(--px,0px), 0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--px,0px), -48px) scale(0.4); }
+    }
+
+    /* ── Heart count: hidden ── */
+    .c3d-heart-count { display: none; }
+
+    /* ── Responsive ── */
+    @media (max-width: 767px) {
+      .c3d-slide { width: 248px; }
+      #gallerySection { padding: 36px 0; }
+      #c3dClip { height: calc(248px * 4 / 3); }
+      #c3dViewport { cursor: default; }
+    }
+    @media (min-width: 768px) and (max-width: 1024px) {
+      .c3d-slide { width: 195px; }
+      #gallerySection { padding: 48px 0; }
+      #c3dClip { height: calc(195px * 4 / 3); }
+    }
+
+    /* ════════════════════════════════════════════
+       FAQ & RSVP SECTION
+    ════════════════════════════════════════════ */
+    #faqSection { height: auto; }
+
+    #faqRoot {
+      display: none;
+      width: 1440px; height: 820px;
+      position: absolute; top: 0; left: 0;
+      transform-origin: top left;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    /* Background */
+    .faq-bg {
+      position: absolute; inset: 0;
+    }
+    .faq-bg img { display: block; width: 100%; height: 100%; object-fit: cover; max-width: none; }
+
+    /* Centre photo composition — CSS grid so all 3 children overlap in cell 1,1 */
+    .faq-photo-grid {
+      display: inline-grid;
+      grid-template-columns: max-content;
+      grid-template-rows: max-content;
+      line-height: 0;
+      place-items: start;
+      flex-shrink: 0;
+    }
+    .faq-arc-tl {
+      grid-column: 1; grid-row: 1;
+      width: 206px; height: 229.5px;
+      margin-left: 0; margin-top: 0;
+      overflow: hidden; position: relative;
+    }
+    .faq-arc-tl img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; max-width: none; }
+    .faq-arc-br {
+      grid-column: 1; grid-row: 1;
+      width: 206px; height: 238px;
+      margin-left: 212px; margin-top: 356px;
+      transform: rotate(180deg);
+      overflow: hidden; position: relative;
+    }
+    .faq-arc-br img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; max-width: none; }
+    .faq-photo-oval {
+      grid-column: 1; grid-row: 1;
+      width: 364px; height: 533px;
+      margin-left: 27px; margin-top: 30px;
+      border-radius: 999px;
+      overflow: hidden; position: relative;
+    }
+    .faq-photo-oval img {
+      position: absolute;
+      left: 0.06%; top: 0;
+      width: 109.82%; height: 100%;
+      max-width: none; display: block;
+      object-fit: cover;
+      filter: grayscale(100%);
+    }
+
+    /* Main content row */
+    .faq-content {
+      position: absolute;
+      left: 64px; top: 80px;
+      width: 1312px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    /* ── FAQ column ── */
+    .faq-col {
+      width: 427px;
+      display: flex; flex-direction: column;
+      gap: 53px;
+    }
+    .faq-header { display: flex; flex-direction: column; gap: 8px; }
+    .faq-title {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 48px; color: #ae1919; line-height: normal;
+    }
+    .faq-subtitle {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 16px; color: #ae1919;
+      line-height: 1.5; letter-spacing: 1.6px;
+      width: 427px;
+    }
+    .faq-list {
+      width: 409px;
+      display: flex; flex-direction: column;
+      gap: 24px;
+    }
+    .faq-item {
+      display: flex; flex-direction: column;
+      gap: 16px;
+    }
+    .faq-question {
+      display: flex; align-items: center;
+      gap: 8px; cursor: pointer;
+    }
+    .faq-plus {
+      width: 16px; height: 16px;
+      flex-shrink: 0; position: relative;
+    }
+    .faq-plus img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      display: block; max-width: none;
+      transition: transform 0.2s ease;
+    }
+    .faq-q-text {
+      font-family: 'Raleway', sans-serif;
+      font-size: 14px; color: #ae1919; font-weight: 700;
+      line-height: 1.5; letter-spacing: 1.4px;
+      text-transform: uppercase; white-space: nowrap;
+    }
+    /* Answer panel (hidden by default, shown on click) */
+    .faq-answer {
+      display: none;
+      font-family: 'Raleway', sans-serif; font-weight: 400;
+      font-size: 13px; color: #ae1919;
+      line-height: 1.6; letter-spacing: 0.6px;
+      padding-bottom: 4px;
+    }
+    .faq-item.open .faq-answer { display: block; }
+    .faq-item.open .faq-plus img { transform: rotate(45deg); }
+
+    /* ── RSVP column ── */
+    .rsvp-col {
+      width: 427px;
+      display: flex; flex-direction: column;
+      gap: 90px;
+    }
+    .rsvp-header { display: flex; flex-direction: column; gap: 8px; }
+    .rsvp-title {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 48px; color: #fff; line-height: normal;
+    }
+    .rsvp-subtitle {
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 16px; color: #fff;
+      line-height: 1.5; letter-spacing: 1.6px;
+      width: 427px;
+    }
+    .rsvp-form {
+      display: flex; flex-direction: column;
+      gap: 48px; align-items: flex-end;
+    }
+    .rsvp-fields {
+      width: 100%;
+      display: flex; flex-direction: column;
+      gap: 16px;
+    }
+    .rsvp-input {
+      width: 100%;
+      border: 2px solid #fff;
+      border-radius: 0 24px 0 24px;
+      padding: 12px 16px;
+      background: transparent;
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 14px; color: #fff;
+      letter-spacing: 1.4px; text-transform: uppercase;
+      outline: none;
+      box-sizing: border-box;
+    }
+    .rsvp-input::placeholder { color: rgba(255,255,255,0.7); }
+    .rsvp-btn {
+      width: 202px;
+      border: 2px solid #fff;
+      border-radius: 24px 0 24px 0;
+      padding: 12px 16px;
+      background: #fff;
+      font-family: 'TAN Mon Cheri', serif;
+      font-size: 14px; color: #ae1919;
+      letter-spacing: 1.4px; text-transform: uppercase;
+      font-weight: bold; text-align: center;
+      cursor: pointer;
+    }
+    .rsvp-btn:hover { background: #f5e8e8; }
+
+    /* ════════════════════════════════════════════
+       FAQ & RSVP — MOBILE (402×1273 canvas)
+    ════════════════════════════════════════════ */
+    #faqMobileRoot {
+      display: none;
+      width: 402px;
+      transform-origin: top left;
+      position: relative;
+      z-index: 1;
+    }
+    @media (max-width: 767px) {
+      #faqRoot       { display: none !important; }
+      #faqMobileRoot { display: block !important; position: relative !important; }
+      #faqSection    { overflow-x: hidden !important; overflow-y: visible !important; height: auto !important; }
+    }
+
+    .fmfaq-bg { position: absolute; inset: 0; overflow: hidden; }
+    .fmfaq-bg img { display: block; width: 100%; height: 100%; object-fit: cover; max-width: none; }
+
+    .fmfaq-content {
+      position: relative; z-index: 1;
+      width: 320px; margin: 0 auto;
+      padding-top: 36px; padding-bottom: 80px;
+      display: flex; flex-direction: column;
+      align-items: flex-start; gap: 48px;
+    }
+
+    /* FAQ block */
+    .fmfaq-col { width: 100%; display: flex; flex-direction: column; gap: 24px; }
+    .fmfaq-header { display: flex; flex-direction: column; gap: 8px; }
+    .fmfaq-title { font-family: 'TAN Mon Cheri', serif; font-size: 32px; color: #ae1919; line-height: normal; }
+    .fmfaq-subtitle { font-family: 'TAN Mon Cheri', serif; font-size: 14px; color: #ae1919; line-height: 1.5; letter-spacing: 1.4px; }
+    .fmfaq-list { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+    .fmfaq-item { display: flex; flex-direction: column; }
+    .fmfaq-question { display: flex; align-items: center; gap: 8px; cursor: pointer; padding-bottom: 4px; }
+    .fmfaq-plus { width: 16px; height: 16px; flex-shrink: 0; display: block; transition: transform 0.25s ease; }
+    .fmfaq-item.open .fmfaq-plus { transform: rotate(45deg); }
+    .fmfaq-q-text {
+      font-family: 'Raleway', sans-serif;
+      font-size: 12px; color: #ae1919; font-weight: 700;
+      letter-spacing: 1.2px; text-transform: uppercase; line-height: 1.5;
+    }
+    .fmfaq-answer {
+      font-family: 'Raleway', sans-serif; font-weight: 400;
+      font-size: 12px; color: #ae1919; line-height: 1.5;
+      padding-left: 20px; max-height: 0; overflow: hidden;
+      transition: max-height 0.35s ease, padding-top 0.35s ease;
+    }
+    .fmfaq-item.open .fmfaq-answer { max-height: 160px; padding-top: 6px; }
+
+    /* Photo composition grid */
+    .fmfaq-photo {
+      display: inline-grid;
+      grid-template-columns: max-content; grid-template-rows: max-content;
+      line-height: 0; place-items: start; flex-shrink: 0; align-self: center;
+    }
+    .fmfaq-arc-tl {
+      grid-column: 1; grid-row: 1;
+      width: 177.416px; height: 197.656px;
+      margin-left: 0; margin-top: 0;
+      overflow: hidden; position: relative;
+    }
+    .fmfaq-arc-br {
+      grid-column: 1; grid-row: 1;
+      width: 177.416px; height: 204.976px;
+      margin-left: 182.58px; margin-top: 306.6px;
+      transform: rotate(180deg);
+      overflow: hidden; position: relative;
+    }
+    .fmfaq-oval {
+      grid-column: 1; grid-row: 1;
+      width: 313.493px; height: 459.043px;
+      margin-left: 23.25px; margin-top: 25.84px;
+      border-radius: 860px; overflow: hidden; position: relative;
+    }
+    .fmfaq-arc-tl img, .fmfaq-arc-br img {
+      position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; display: block;
+    }
+    .fmfaq-oval img {
+      position: absolute; left: 0.06%; top: 0;
+      width: 109.82%; height: 100%; max-width: none; display: block;
+      object-fit: cover; filter: grayscale(100%);
+    }
+
+    /* RSVP block */
+    .fmrsvp-col { width: 100%; display: flex; flex-direction: column; gap: 24px; }
+    .fmrsvp-header { display: flex; flex-direction: column; gap: 8px; }
+    .fmrsvp-title { font-family: 'TAN Mon Cheri', serif; font-size: 32px; color: #fff; line-height: normal; }
+    .fmrsvp-subtitle { font-family: 'TAN Mon Cheri', serif; font-size: 14px; color: #fff; line-height: 1.5; letter-spacing: 1.4px; }
+    .fmrsvp-form { width: 100%; display: flex; flex-direction: column; align-items: flex-end; gap: 24px; }
+    .fmrsvp-fields { width: 100%; display: flex; flex-direction: column; gap: 16px; }
+    .fmrsvp-input {
+      width: 100%; border: 2px solid #fff; border-radius: 0 24px 0 24px;
+      padding: 12px 16px; background: transparent;
+      font-family: 'Raleway', sans-serif; font-weight: 300; font-size: 12px; color: #fff;
+      letter-spacing: 1.2px; text-transform: uppercase; outline: none; box-sizing: border-box;
+    }
+    .fmrsvp-input::placeholder { color: rgba(255,255,255,0.7); }
+    .fmrsvp-btn {
+      width: 202px; border: 2px solid #fff; border-radius: 24px 0 24px 0;
+      padding: 12px 16px; background: #fff;
+      font-family: 'Raleway', sans-serif; font-weight: 700; font-size: 12px; color: #ae1919;
+      letter-spacing: 1.2px; text-transform: uppercase;
+      text-align: center; cursor: pointer;
+    }
+    .fmrsvp-btn:hover { background: #f5e8e8; }
+
+
+    /* ════════════════════════════════════════════
+       KEYFRAMES
+    ════════════════════════════════════════════ */
+    @keyframes fadeSlideDown  { to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideFromLeft  { to { opacity: 1; transform: translateX(0); } }
+    @keyframes slideFromRight { to { opacity: 1; transform: translateX(0); } }
+    @keyframes arcFadeIn      { to { opacity: 1; } }
+    @keyframes paintWipe      { to { clip-path: inset(0 0% 0 0); } }
+    @keyframes photoReveal    { to { opacity: 1; transform: scale(1); } }
+    @keyframes gentleFadeIn   { to { opacity: 1; } }
+    @keyframes pulse          { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+    @keyframes arrowBounce    { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+
+    /* ════════════════════════════════════════════
+       LIGHTBOX
+    ════════════════════════════════════════════ */
+    #lightbox {
+      display: none; position: fixed; inset: 0; z-index: 10000;
+      background: rgba(26,10,10,0.95);
+      align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    #lightbox.open    { display: flex; }
+    #lightbox.visible { opacity: 1; }
+    #lbImgWrap {
+      max-width: 90vw; max-height: 90vh;
+      opacity: 0; transform: scale(0.92);
+      transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1);
+    }
+    #lightbox.visible #lbImgWrap { opacity: 1; transform: scale(1); }
+    #lbImg { max-width: 90vw; max-height: 90vh; object-fit: contain; display: block; border-radius: 4px; }
+    #lbClose {
+      position: absolute; top: 20px; right: 24px;
+      background: none; border: none; color: #fff;
+      font-size: 32px; cursor: pointer; line-height: 1; opacity: 0.8;
+      font-family: sans-serif;
+    }
+    #lbClose:hover { opacity: 1; }
+    #lbPrev, #lbNext {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: #fff;
+      font-size: 28px; cursor: pointer; padding: 20px; opacity: 0.7;
+      font-family: sans-serif;
+    }
+    #lbPrev:hover, #lbNext:hover { opacity: 1; }
+    #lbPrev { left: 12px; }
+    #lbNext { right: 12px; }
+
+
+    /* ════════════════════════════════════════════
+       HERO VECTOR CURVE — Figma design element
+       In Figma (1440×757 frame):
+         left:0, top:225.98px, w:1435px, h:506px
+         → top ≈ 29.9%, height ≈ 66.9% of frame.
+       Placed BEFORE hero-container in DOM; same
+       z-index:1, so hero-container (later in DOM)
+       renders on top — photo naturally overlays curve.
+    ════════════════════════════════════════════ */
+    /* Shared positioning for curve image + text SVG overlay.
+       Both sit at the same coordinates so text rides the curve exactly.
+       Placed before hero-container in DOM → photo renders on top naturally. */
+    /* FIX 1: guide line hidden — only text shows, not the red stroke */
+    #heroVectorCurve { display: none; }
+
+    #heroTextSvg {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      top: 50%;
+      height: 67vh;
+      transform: translateY(-50%);
+      pointer-events: none;
+      z-index: 1;
+      overflow: visible;
+    }
+
+    /* Styling is on SVG presentation attributes; no override needed here */
+
+    /* Mobile curved text — Figma-flattened vector outlines, static */
+    #heroTextSvgMob {
+      position: absolute;
+      left: 0;
+      top: 105.5px;
+      width: 100%;
+      height: auto;
+      pointer-events: none;
+      z-index: 1;
+      display: none; /* hidden on desktop */
+      opacity: 0.85;
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+    }
+
+    @media (max-width: 767px) {
+      #heroTextSvg    { display: none; }
+      #heroTextSvgMob { display: block; }
+      .hmq-track      { display: none; }
+    }
+
+    /* Desktop SVG: enable ligatures for Indic scripts */
+    #heroTextSvg text {
+      font-feature-settings: "liga" 1, "clig" 1, "calt" 1;
+    }
+
+    /* ════════════════════════════════════════════
+       ADDITIONAL KEYFRAMES
+    ════════════════════════════════════════════ */
+    @keyframes writeReveal  { to { opacity: 1; clip-path: inset(0 0% 0 0); } }
+    @keyframes arcRevealTL  { to { opacity: 1; clip-path: inset(0 0% 0% 0); } }
+    @keyframes arcRevealBR  { to { opacity: 1; clip-path: inset(0% 0 0 0%); } }
+    @keyframes photoFloat {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-6px); }
+    }
+
+    /* ════════════════════════════════════════════
+       MUSIC TOGGLE BUTTON
+    ════════════════════════════════════════════ */
+    #musicToggle {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      width: 48px;
+      height: 48px;
+      border-radius: 24px;
+      background: #eaebe4;
+      border: 0.6px solid #ae1919;
+      box-shadow: 0px 4px 4px 0px rgba(0,0,0,0.25);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      padding: 0;
+      outline-offset: 3px;
+    }
+    #musicToggle:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+    #musicToggle:active {
+      transform: scale(0.95);
+    }
+    #musicToggle svg {
+      width: 24px;
+      height: 24px;
+      transition: opacity 0.3s ease;
+    }
+    /* Equalizer bars (shown when playing) */
+    #musicToggle .eq-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 22px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      position: absolute;
+    }
+    #musicToggle .eq-bars span {
+      display: block;
+      width: 4px;
+      border-radius: 2px;
+      background: #8B1A1A;
+      transform-origin: bottom;
+    }
+    #musicToggle .eq-bars span:nth-child(1) { height: 10px; }
+    #musicToggle .eq-bars span:nth-child(2) { height: 18px; }
+    #musicToggle .eq-bars span:nth-child(3) { height: 13px; }
+    @keyframes eqBounce1 { 0%,100%{height:6px}  50%{height:16px} }
+    @keyframes eqBounce2 { 0%,100%{height:18px} 50%{height:7px}  }
+    @keyframes eqBounce3 { 0%,100%{height:10px} 50%{height:20px} }
+    #musicToggle.playing .eq-bars { opacity: 1; }
+    #musicToggle.playing .eq-bars span:nth-child(1) {
+      animation: eqBounce1 0.9s ease-in-out infinite;
+    }
+    #musicToggle.playing .eq-bars span:nth-child(2) {
+      animation: eqBounce2 0.7s ease-in-out infinite;
+    }
+    #musicToggle.playing .eq-bars span:nth-child(3) {
+      animation: eqBounce3 1.1s ease-in-out infinite;
+    }
+    /* Music-off icon (note + slash) */
+    #musicToggle .icon-off { opacity: 1; transition: opacity 0.3s ease; }
+    #musicToggle.playing  .icon-off { opacity: 0; }
+    @media (max-width: 767px) {
+      #musicToggle { width: 44px; height: 44px; bottom: 20px; right: 20px; }
+      #musicToggle svg { width: 22px; height: 22px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #musicToggle .eq-bars span { animation: none !important; }
+    }
+
+/* ── Music tooltip (speech bubble) ── */
+#musicTooltip {
+  position: fixed;
+  z-index: 999;
+  bottom: 32px;
+  right: 82px; /* desktop: left of music button */
+
+  background: #ae1919;
+  color: #F5F0E8;
+  font-family: 'Raleway', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  line-height: 1;
+  white-space: nowrap;
+
+  padding: 8px 14px;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px) scale(0.96);
+  transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#musicTooltip.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  animation: tooltipPulse 1.8s ease-in-out 0.5s 2;
+}
+
+@keyframes tooltipPulse {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-1px) scale(1.04); }
+}
+
+/* Desktop tail: points right toward the button */
+#musicTooltip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -8px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 9px solid #ae1919;
+}
+
+/* Mobile: bubble above button, tail points down */
+@media (max-width: 767px) {
+  #musicTooltip {
+    bottom: 72px;
+    right: 8px;
+  }
+
+  #musicTooltip::after {
+    top: auto;
+    right: 22px;
+    bottom: -8px;
+    transform: none;
+    border-top: 9px solid #ae1919;
+    border-right: 7px solid transparent;
+    border-left: 7px solid transparent;
+    border-bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #musicTooltip {
+    transform: none;
+    transition: opacity 0.2s ease;
+  }
+
+  #musicTooltip.visible {
+    animation: none;
+  }
+}

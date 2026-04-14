@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Wedding Events — Rahul & Kashish</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Dancing+Script:wght@600&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; min-height: 100vh; background: #F5F0E8; }
+
+/* ═══════════════════════════════════════
+   SECTION
+═══════════════════════════════════════ */
+#eventsSection {
+  position: relative;
+  width: 100%;
+  background: #F5F0E8;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════
+   BACKGROUND TEXTURE
+═══════════════════════════════════════ */
+.evt-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+.evt-bg.bg-show { opacity: 1; }
+.evt-bg img {
+  position: absolute;
+  width: 139.68%; height: 100.34%;
+  left: -19.84%; top: 0;
+  max-width: none; display: block;
+}
+
+/* ═══════════════════════════════════════
+   SCALE ROOT — desktop 1440 × 1550
+═══════════════════════════════════════ */
+#eventsRoot {
+  position: absolute;
+  top: 0; left: 0;
+  width: 1440px;
+  height: 1550px;
+  transform-origin: top left;
+  z-index: 1;
+}
+
+/* ═══════════════════════════════════════
+   ORNAMENTS
+═══════════════════════════════════════ */
+.evt-orn {
+  position: absolute;
+  left: 1004px; top: 0;
+  display: flex;
+  align-items: flex-start;
+  transform-origin: top center;
+  opacity: 0;
+  transform: translateY(-100px) rotate(-8deg);
+  transition: opacity 1s ease, transform 1s cubic-bezier(0.34, 1.5, 0.64, 1);
+}
+.evt-orn.orn-show {
+  opacity: 1;
+  transform: translateY(0) rotate(0deg);
+}
+.evt-orn-a { width: 137.144px; height: 218.199px; position: relative; flex-shrink: 0; }
+.evt-orn-b { width: 137.144px; height: 354.199px; position: relative; flex-shrink: 0; }
+.evt-orn-a img, .evt-orn-b img {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+}
+
+/* Subtle secondary swing for realism */
+.evt-orn-b {
+  transition: opacity 1s ease 0.08s, transform 1s cubic-bezier(0.34, 1.3, 0.64, 1) 0.08s;
+}
+
+/* ═══════════════════════════════════════
+   SCRIPT TEXT — handwriting reveal
+═══════════════════════════════════════ */
+.evt-script {
+  position: absolute;
+  left: 767px; top: 354px;
+  width: 295px;
+  font-family: 'Dancing Script', cursive;
+  font-size: 36px;
+  color: #8B1A1A;
+  line-height: 1.5;
+  opacity: 0;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 1.4s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.2s ease;
+}
+.evt-script.script-show {
+  opacity: 1;
+  clip-path: inset(0 0% 0 0);
+}
+
+/* ═══════════════════════════════════════
+   CARD POSITION WRAPPERS
+═══════════════════════════════════════ */
+.evt-card-pos {
+  position: absolute;
+  width: 492px;
+  height: 665px;
+}
+
+/* ═══════════════════════════════════════
+   CARD SHAPES
+═══════════════════════════════════════ */
+.evt-card {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: rgba(245, 240, 232, 0.92);
+  opacity: 0;
+  transition: opacity 0.5s ease,
+              transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.35s ease;
+}
+.evt-card.card-show { opacity: 1; }
+
+/* Asymmetric corners per user spec */
+.evt-card--haldi    { border-radius: 0 200px 200px 0; }  /* TR + BR */
+.evt-card--sangeet  { border-radius: 200px 0 0 200px; }  /* TL + BL */
+.evt-card--reception{ border-radius: 0 200px 0 0; }      /* TR only  */
+
+/* Hover lift */
+.evt-card-pos:hover .evt-card {
+  transform: translateY(-10px);
+  box-shadow: 0 24px 48px rgba(139, 26, 26, 0.18),
+              0 6px 16px rgba(139, 26, 26, 0.1);
+}
+
+/* ═══════════════════════════════════════
+   CARD BORDER SVGs
+═══════════════════════════════════════ */
+.evt-card-border {
+  position: absolute;
+  inset: 0;
+  width: 492px; height: 665px;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 2;
+}
+.evt-border-path {
+  fill: none;
+  stroke: #8B1A1A;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* dasharray / dashoffset set by JS */
+  transition: stroke 0.3s ease, filter 0.3s ease;
+}
+.evt-card-pos:hover .evt-border-path {
+  stroke: #B52424;
+  filter: drop-shadow(0 0 5px rgba(181, 36, 36, 0.45));
+}
+
+/* ═══════════════════════════════════════
+   CARD CONTENT
+═══════════════════════════════════════ */
+.evt-card-inner {
+  position: absolute;
+  left: 37.5px; top: 37.5px;
+  width: 412px; height: 585px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Staggered reveal on children when text-show applied to inner */
+.evt-card-inner > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.evt-card-inner.text-show > *:nth-child(1) {
+  opacity: 1; transform: none; transition-delay: 0s;
+}
+.evt-card-inner.text-show > *:nth-child(2) {
+  opacity: 1; transform: none; transition-delay: 0.18s;
+}
+.evt-card-inner.text-show > *:nth-child(3) {
+  opacity: 1; transform: none; transition-delay: 0.36s;
+}
+
+/* Title block */
+.evt-event-name {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 48px;
+  color: #8B1A1A;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+.evt-event-meta {
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: #8B1A1A;
+  line-height: 1.6;
+  letter-spacing: 1.5px;
+}
+
+/* Body text */
+.evt-body {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: #8B1A1A;
+  line-height: 1.65;
+  flex: 1;
+}
+
+/* Venue */
+.evt-venue-name {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  font-size: 22px;
+  color: #8B1A1A;
+  line-height: 1.8;
+}
+.evt-venue-addr {
+  font-family: 'Lora', serif;
+  font-size: 12px;
+  color: #8B1A1A;
+  line-height: 1.8;
+  letter-spacing: 0.8px;
+}
+
+/* Right-aligned variant for Reception */
+.evt-card-inner--right .evt-event-name,
+.evt-card-inner--right .evt-event-meta,
+.evt-card-inner--right .evt-body,
+.evt-card-inner--right .evt-venue-name,
+.evt-card-inner--right .evt-venue-addr {
+  text-align: right;
+}
+
+/* ═══════════════════════════════════════
+   MOBILE LAYOUT  (< 768px)
+═══════════════════════════════════════ */
+@media (max-width: 767px) {
+  #eventsRoot      { display: none !important; }
+  .events-mobile   { display: flex; }
+}
+@media (min-width: 768px) {
+  .events-mobile   { display: none; }
+}
+
+.events-mobile {
+  flex-direction: column;
+  gap: 28px;
+  padding: 56px 20px 64px;
+  position: relative;
+  z-index: 1;
+}
+
+.mob-script {
+  font-family: 'Dancing Script', cursive;
+  font-size: 28px;
+  color: #8B1A1A;
+  line-height: 1.5;
+  text-align: center;
+  padding: 0 8px 8px;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.mob-script.text-show { opacity: 1; }
+
+.mob-card {
+  padding: 28px 24px;
+  border: 2px solid #8B1A1A;
+  background: rgba(245, 240, 232, 0.7);
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s ease,
+              box-shadow 0.3s ease;
+}
+.mob-card.card-show { opacity: 1; transform: none; }
+.mob-card:active {
+  box-shadow: 0 12px 32px rgba(139, 26, 26, 0.15);
+  transform: translateY(-4px);
+}
+
+/* Matching asymmetric corners at mobile scale */
+.mob-card--haldi    { border-radius: 0 60px 60px 0; }
+.mob-card--sangeet  { border-radius: 60px 0 0 60px; }
+.mob-card--reception{ border-radius: 0 60px 0 0; }
+
+.mob-event-name {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 36px;
+  color: #8B1A1A;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.mob-event-meta {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  color: #8B1A1A;
+  line-height: 1.7;
+  letter-spacing: 1px;
+}
+.mob-body {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: #8B1A1A;
+  line-height: 1.65;
+  margin: 16px 0;
+}
+.mob-venue-name {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: #8B1A1A;
+  line-height: 1.8;
+}
+.mob-venue-addr {
+  font-family: 'Lora', serif;
+  font-size: 11px;
+  color: #8B1A1A;
+  line-height: 1.8;
+}
+.mob-card--reception .mob-event-name,
+.mob-card--reception .mob-event-meta,
+.mob-card--reception .mob-body,
+.mob-card--reception .mob-venue-name,
+.mob-card--reception .mob-venue-addr { text-align: right; }
+</style>
+</head>
+
+<body>
+<section id="eventsSection">
+
+  <!-- Textured background -->
+  <div class="evt-bg" id="evtBg">
+    <img src="https://www.figma.com/api/mcp/asset/5d7ff280-c0ca-4dd3-8fa4-b0a1435b25bf" alt=""/>
+  </div>
+
+  <!-- ────── DESKTOP CANVAS ────── -->
+  <div id="eventsRoot">
+
+    <!-- Kolam ornaments — top right -->
+    <div class="evt-orn" id="evtOrn">
+      <div class="evt-orn-a">
+        <img src="https://www.figma.com/api/mcp/asset/37e6c26a-4590-49a9-887e-f63498c4ad67" alt=""/>
+      </div>
+      <div class="evt-orn-b">
+        <img src="https://www.figma.com/api/mcp/asset/37c37c41-3592-48be-b111-b3f62ba5795b" alt=""/>
+      </div>
+    </div>
+
+    <!-- Script text -->
+    <p class="evt-script" id="evtScript">Come celebrate with us as we begin our forever.</p>
+
+    <!-- ── Haldi  (left:196  top:85) ── -->
+    <div class="evt-card-pos" style="left:196px;top:85px;" id="evtHaldi">
+      <div class="evt-card evt-card--haldi">
+        <div class="evt-card-inner" id="evtHaldiInner">
+          <div class="evt-title-block">
+            <p class="evt-event-name">Haldi</p>
+            <p class="evt-event-meta">June 20, 2026</p>
+            <p class="evt-event-meta">9 AM onwards</p>
+          </div>
+          <p class="evt-body">Things are about to get messy, golden, and beautiful. Wear something you don't love too much.</p>
+          <div class="evt-venue">
+            <p class="evt-venue-name">The River Retreat</p>
+            <p class="evt-venue-addr">Cheruthuruthi, Thrissur, Kerala</p>
+          </div>
+        </div>
+      </div>
+      <!-- Border path: border-radius 0 200px 200px 0 → TR + BR arcs -->
+      <svg class="evt-card-border" viewBox="0 0 492 665" xmlns="http://www.w3.org/2000/svg">
+        <path class="evt-border-path" id="pathHaldi"
+          d="M 0,0 L 292,0 A 200,200 0 0,1 492,200 L 492,465 A 200,200 0 0,1 292,665 L 0,665 Z"/>
+      </svg>
+    </div>
+
+    <!-- ── Sangeet  (left:752  top:521) ── -->
+    <div class="evt-card-pos" style="left:752px;top:521px;" id="evtSangeet">
+      <div class="evt-card evt-card--sangeet">
+        <div class="evt-card-inner" id="evtSangeetInner">
+          <div class="evt-title-block">
+            <p class="evt-event-name">Sangeet</p>
+            <p class="evt-event-meta">June 20, 2026</p>
+            <p class="evt-event-meta">4 PM onwards</p>
+          </div>
+          <p class="evt-body">Get ready to dance the night away, share stories, and celebrate love in its most joyful form.</p>
+          <div class="evt-venue">
+            <p class="evt-venue-name">The River Retreat</p>
+            <p class="evt-venue-addr">Cheruthuruthi, Thrissur, Kerala</p>
+          </div>
+        </div>
+      </div>
+      <!-- Border path: border-radius 200px 0 0 200px → TL + BL arcs -->
+      <svg class="evt-card-border" viewBox="0 0 492 665" xmlns="http://www.w3.org/2000/svg">
+        <path class="evt-border-path" id="pathSangeet"
+          d="M 0,200 A 200,200 0 0,1 200,0 L 492,0 L 492,665 L 200,665 A 200,200 0 0,1 0,465 Z"/>
+      </svg>
+    </div>
+
+    <!-- ── Reception  (left:196  top:814) ── -->
+    <div class="evt-card-pos" style="left:196px;top:814px;" id="evtReception">
+      <div class="evt-card evt-card--reception">
+        <div class="evt-card-inner evt-card-inner--right" id="evtReceptionInner">
+          <div class="evt-title-block">
+            <p class="evt-event-name">Reception</p>
+            <p class="evt-event-meta">June 27, 2026</p>
+            <p class="evt-event-meta">7 PM onwards</p>
+          </div>
+          <p class="evt-body">All dressed up, officially married, and ready to celebrate. Join us for the grand finale.</p>
+          <div class="evt-venue">
+            <p class="evt-venue-name">The Date Banquets</p>
+            <p class="evt-venue-addr">Metro Pillar No. 52-55, Jhilmil Industrial Area</p>
+          </div>
+        </div>
+      </div>
+      <!-- Border path: border-radius 0 200px 0 0 → TR arc only -->
+      <svg class="evt-card-border" viewBox="0 0 492 665" xmlns="http://www.w3.org/2000/svg">
+        <path class="evt-border-path" id="pathReception"
+          d="M 0,0 L 292,0 A 200,200 0 0,1 492,200 L 492,665 L 0,665 Z"/>
+      </svg>
+    </div>
+
+  </div><!-- /eventsRoot -->
+
+  <!-- ────── MOBILE LAYOUT ────── -->
+  <div class="events-mobile">
+    <p class="mob-script" id="mobScript">Come celebrate with us as we begin our forever.</p>
+
+    <div class="mob-card mob-card--haldi" id="mobHaldi">
+      <p class="mob-event-name">Haldi</p>
+      <p class="mob-event-meta">June 20, 2026 &middot; 9 AM onwards</p>
+      <p class="mob-body">Things are about to get messy, golden, and beautiful. Wear something you don't love too much.</p>
+      <p class="mob-venue-name">The River Retreat</p>
+      <p class="mob-venue-addr">Cheruthuruthi, Thrissur, Kerala</p>
+    </div>
+
+    <div class="mob-card mob-card--sangeet" id="mobSangeet">
+      <p class="mob-event-name">Sangeet</p>
+      <p class="mob-event-meta">June 20, 2026 &middot; 4 PM onwards</p>
+      <p class="mob-body">Get ready to dance the night away, share stories, and celebrate love in its most joyful form.</p>
+      <p class="mob-venue-name">The River Retreat</p>
+      <p class="mob-venue-addr">Cheruthuruthi, Thrissur, Kerala</p>
+    </div>
+
+    <div class="mob-card mob-card--reception" id="mobReception">
+      <p class="mob-event-name">Reception</p>
+      <p class="mob-event-meta">June 27, 2026 &middot; 7 PM onwards</p>
+      <p class="mob-body">All dressed up, officially married, and ready to celebrate. Join us for the grand finale.</p>
+      <p class="mob-venue-name">The Date Banquets</p>
+      <p class="mob-venue-addr">Metro Pillar No. 52-55, Jhilmil Industrial Area</p>
+    </div>
+  </div>
+
+</section>
+
+<script>
+'use strict';
+
+/* ── DOM refs ─────────────────────────────────── */
+const section    = document.getElementById('eventsSection');
+const eventsRoot = document.getElementById('eventsRoot');
+
+/* ── Responsive scaling ──────────────────────── */
+function applyScale() {
+  const W = window.innerWidth;
+  const sf = W / 1440;
+  eventsRoot.style.transform = `scale(${sf})`;
+  section.style.height = Math.round(1550 * sf) + 'px';
+}
+applyScale();
+window.addEventListener('resize', applyScale);
+
+/* ── Border-draw setup ───────────────────────── */
+// Measure each path length and prime dasharray/dashoffset
+function setupBorders() {
+  ['pathHaldi', 'pathSangeet', 'pathReception'].forEach(id => {
+    const path = document.getElementById(id);
+    if (!path) return;
+    const len = path.getTotalLength();
+    path.style.strokeDasharray  = len;
+    path.style.strokeDashoffset = len;
+    // Remove any CSS transition so the initial hidden state sets instantly
+    path.style.transition = 'none';
+  });
+}
+setupBorders();
+
+/* ── Draw a border path ──────────────────────── */
+function drawBorder(pathId, duration = 1000, delay = 0) {
+  setTimeout(() => {
+    const path = document.getElementById(pathId);
+    if (!path) return;
+    // Re-read length in case layout changed
+    const len = path.getTotalLength();
+    path.style.strokeDasharray  = len;
+    path.style.strokeDashoffset = len;
+    // Force reflow so the initial value is committed before transitioning
+    path.getBoundingClientRect();
+    path.style.transition = `stroke-dashoffset ${duration}ms cubic-bezier(0.4, 0, 0.2, 1),
+                             stroke 0.3s ease, filter 0.3s ease`;
+    path.style.strokeDashoffset = 0;
+  }, delay);
+}
+
+/* ── Reveal card fill & text ─────────────────── */
+function revealCard(cardId, innerId, delay = 0) {
+  setTimeout(() => {
+    const card  = document.querySelector(`#${cardId} .evt-card`);
+    const inner = document.getElementById(innerId);
+    if (card)  card.classList.add('card-show');
+    if (inner) inner.classList.add('text-show');
+  }, delay);
+}
+
+/* ── Full animation sequence ─────────────────── */
+let fired = false;
+function runSequence() {
+  if (fired) return;
+  fired = true;
+
+  // 1 — background (0ms)
+  document.getElementById('evtBg').classList.add('bg-show');
+
+  // 2 — ornaments drop (500ms)
+  setTimeout(() => document.getElementById('evtOrn').classList.add('orn-show'), 500);
+
+  // 3 — script text reveal L→R (1000ms)
+  setTimeout(() => document.getElementById('evtScript').classList.add('script-show'), 1000);
+
+  // 4 — Haldi border draws (1500ms, 1s) → fill + text (2500ms)
+  drawBorder('pathHaldi', 1000, 1500);
+  revealCard('evtHaldi', 'evtHaldiInner', 2500);
+
+  // 5 — Sangeet border draws (3000ms, 1s) → fill + text (4000ms)
+  drawBorder('pathSangeet', 1000, 3000);
+  revealCard('evtSangeet', 'evtSangeetInner', 4000);
+
+  // 6 — Reception border draws (4500ms, 1s) → fill + text (5500ms)
+  drawBorder('pathReception', 1000, 4500);
+  revealCard('evtReception', 'evtReceptionInner', 5500);
+
+  // Mobile — simpler stagger
+  setTimeout(() => document.getElementById('mobScript').classList.add('text-show'),  200);
+  setTimeout(() => document.getElementById('mobHaldi').classList.add('card-show'),    600);
+  setTimeout(() => document.getElementById('mobSangeet').classList.add('card-show'), 1000);
+  setTimeout(() => document.getElementById('mobReception').classList.add('card-show'), 1400);
+}
+
+/* ── IntersectionObserver trigger ────────────── */
+const observer = new IntersectionObserver(entries => {
+  if (!entries[0].isIntersecting) return;
+  observer.disconnect();
+  runSequence();
+}, { threshold: 0.08 });
+observer.observe(section);
+
+// Fire immediately if already in view
+const r = section.getBoundingClientRect();
+if (r.top < window.innerHeight && r.bottom > 0) {
+  observer.disconnect();
+  runSequence();
+}
+
+/* ── Parallax on scroll ──────────────────────── */
+// Each card drifts at a slightly different rate to create depth.
+// Speeds are tuned in the unscaled 1440px coordinate space.
+const parallaxCards = [
+  { el: document.getElementById('evtHaldi'),     speed:  0.07 },
+  { el: document.getElementById('evtSangeet'),   speed:  0.12 },
+  { el: document.getElementById('evtReception'), speed:  0.04 },
+];
+
+function onScroll() {
+  const rect     = section.getBoundingClientRect();
+  const scrolled = Math.max(0, -rect.top); // px scrolled past section top
+  const sf       = window.innerWidth / 1440;
+
+  parallaxCards.forEach(({ el, speed }) => {
+    // Apply offset in screen-space (will be divided by sf to stay correct in scale-root)
+    const offset = (scrolled * speed) / sf;
+    el.style.transform = `translateY(${-offset}px)`;
+  });
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+</script>
+</body>
+</html>
