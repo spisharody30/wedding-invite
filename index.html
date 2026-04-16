@@ -370,7 +370,8 @@
     }
     .hero-mob-arrow {
       width: 48px; height: 48px; display: block; flex-shrink: 0;
-      animation: arrowBounce 1.3s ease-in-out 2.4s infinite;
+      cursor: pointer;
+      animation: arrowBounce 1.8s ease-in-out 2.4s infinite;
     }
 
     /* ════════════════════════════════════════════
@@ -1544,7 +1545,7 @@
     @keyframes photoReveal    { to { opacity: 1; transform: scale(1); } }
     @keyframes gentleFadeIn   { to { opacity: 1; } }
     @keyframes pulse          { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
-    @keyframes arrowBounce    { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+    @keyframes arrowBounce    { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
 
     /* ════════════════════════════════════════════
        LIGHTBOX
@@ -1964,6 +1965,13 @@
         </div>
         <div class="hero-mob-cta">
           <p class="hero-mob-date">21.06.2026 ❤️</p>
+          <a class="hero-mob-arrow" href="#invitationSection" aria-label="Scroll to invitation section">
+            <svg viewBox="0 0 48 48" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="24" cy="24" r="23" stroke="#AE1919" stroke-opacity="0.38" stroke-width="1.5"/>
+              <path d="M24 15V31" stroke="#AE1919" stroke-width="2.25" stroke-linecap="round"/>
+              <path d="M17.5 24.5L24 31L30.5 24.5" stroke="#AE1919" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
         </div>
       </div>
 
@@ -3094,35 +3102,83 @@
     });
   });
 
-  // ── RSVP form (desktop) ────────────────────────────────────────────────
-  document.getElementById('rsvpForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const name   = e.target.name.value.trim();
-    const guests = e.target.guests.value.trim();
-    if (!name || !guests) return;
-    const btn = e.target.querySelector('.rsvp-btn');
-    btn.textContent = '✓ Received!';
-    btn.style.background = '#e8f5e9';
-    btn.style.color = '#2e7d32';
-    btn.disabled = true;
-    e.target.name.value = '';
-    e.target.guests.value = '';
-  });
+  // ── RSVP form submission to Google Sheets ──────────────────────────────
+  // 1) Copy google-apps-script/rsvp.gs into your Sheet’s Apps Script project and deploy as Web app.
+  // 2) Paste the Web App URL below. Optional: set RSVP_SECRET (same as Script property RSVP_SECRET).
+  const RSVP_WEB_APP_URL = '';
+  const RSVP_SECRET = '';
 
-  // ── RSVP form (mobile) ────────────────────────────────────────────────
-  document.getElementById('rsvpMobileForm').addEventListener('submit', (e) => {
+  async function postRsvpToSheet(payload) {
+    if (!RSVP_WEB_APP_URL) {
+      throw new Error('RSVP endpoint is not configured.');
+    }
+
+    const body = Object.assign({}, payload);
+    if (RSVP_SECRET) body.secret = RSVP_SECRET;
+
+    const res = await fetch(RSVP_WEB_APP_URL, {
+      method: 'POST',
+      body: JSON.stringify(body) // Simple request body (no custom headers) to avoid CORS preflight.
+    });
+
+    if (!res.ok) {
+      throw new Error('Network error while sending RSVP.');
+    }
+
+    // Some Apps Script responses may be empty/non-JSON. Treat 2xx as success.
+    try {
+      const data = await res.json();
+      if (data && data.ok === false) throw new Error(data.error || 'RSVP rejected.');
+    } catch (_) {
+      // No-op: non-JSON response is still acceptable for this endpoint.
+    }
+  }
+
+  async function handleRsvpSubmit(e, btnSelector, defaultLabel) {
     e.preventDefault();
-    const name   = e.target.name.value.trim();
-    const guests = e.target.guests.value.trim();
+    const form = e.target;
+    const name = form.name.value.trim();
+    const guests = form.guests.value.trim();
     if (!name || !guests) return;
-    const btn = e.target.querySelector('.fmrsvp-btn');
-    btn.textContent = '✓ Received!';
-    btn.style.background = '#e8f5e9';
-    btn.style.color = '#2e7d32';
+
+    const btn = form.querySelector(btnSelector);
+    const initialBg = btn.style.background;
+    const initialColor = btn.style.color;
+    btn.textContent = 'Sending...';
     btn.disabled = true;
-    e.target.name.value = '';
-    e.target.guests.value = '';
-  });
+
+    try {
+      await postRsvpToSheet({
+        name,
+        guests: Number(guests),
+        source: form.id,
+        submittedAt: new Date().toISOString()
+      });
+      btn.textContent = '✓ Received!';
+      btn.style.background = '#e8f5e9';
+      btn.style.color = '#2e7d32';
+      form.reset();
+    } catch (err) {
+      btn.textContent = 'Try again';
+      btn.style.background = '#fdecea';
+      btn.style.color = '#b3261e';
+      btn.disabled = false;
+      setTimeout(() => {
+        btn.textContent = defaultLabel;
+        btn.style.background = initialBg;
+        btn.style.color = initialColor;
+      }, 1600);
+      console.error(err);
+    }
+  }
+
+  document.getElementById('rsvpForm').addEventListener('submit', (e) =>
+    handleRsvpSubmit(e, '.rsvp-btn', 'Send')
+  );
+
+  document.getElementById('rsvpMobileForm').addEventListener('submit', (e) =>
+    handleRsvpSubmit(e, '.fmrsvp-btn', 'Send')
+  );
 
   // ── Photo float: starts after hero oval reveals ───────────────────────
   setTimeout(function() {
