@@ -642,14 +642,22 @@
       font-family: 'Raleway', sans-serif; font-weight: 600;
       text-transform: uppercase; text-align: center;
       color: #ae1919; line-height: 1.5;
-      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      display: flex; flex-direction: column; align-items: center; gap: 22px;
       opacity: 0; transition: opacity 0.8s ease;
     }
     .wedding-venue.inv-show { opacity: 1; }
     .wedding-venue-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
     .wedding-venue-time,
     .wedding-venue-name,
-    .wedding-venue-loc  { font-size: 13px; letter-spacing: 1.5389px; line-height: 1.5; display: block; }
+    .wedding-venue-loc  {
+      font-family: 'Raleway', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 1.5389px;
+      text-transform: uppercase;
+      line-height: 1.5;
+      display: block;
+    }
 
     /* ── Map link icon (shared across all venue mentions) ── */
     .venue-map-link {
@@ -664,6 +672,13 @@
     .venue-map-link:hover  { transform: scale(1.15); opacity: 0.75; }
     .venue-map-link:active { transform: scale(0.9); }
     .venue-map-link:focus-visible { outline: 2px solid #ae1919; outline-offset: 2px; border-radius: 2px; }
+    .venue-map-link--inline {
+      margin-left: 0;
+      gap: 6px;
+      text-decoration: none;
+      color: inherit;
+      text-transform: inherit;
+    }
     .venue-map-icon { width: 18px; height: 18px; display: block; }
     @media (max-width: 767px) { .venue-map-icon { width: 20px; height: 20px; } }
 
@@ -900,14 +915,22 @@
       font-family: 'Raleway', sans-serif; font-weight: 600;
       text-transform: uppercase; text-align: center;
       color: #ae1919; line-height: 1.5; flex-shrink: 0;
-      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      display: flex; flex-direction: column; align-items: center; gap: 18px;
       opacity: 0; transition: opacity 0.7s ease;
     }
     .imob-venue.inv-show { opacity: 1; }
     .imob-venue-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
     .imob-venue-time,
     .imob-venue-name,
-    .imob-venue-loc  { font-size: 10px; letter-spacing: 1px; line-height: 1.5; display: block; }
+    .imob-venue-loc  {
+      font-family: 'Raleway', sans-serif;
+      font-weight: 600;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      line-height: 1.5;
+      display: block;
+    }
 
     /* Bottom ornament */
     .imob-orn-bot {
@@ -2053,11 +2076,11 @@
                   <div class="wedding-venue">
                     <div class="wedding-venue-item">
                       <span class="wedding-venue-time">9:15 AM THALIKEETU</span>
-                      <span class="wedding-venue-loc">UTHRALIKKAVU BHAGAVATHI TEMPLE<a href="https://maps.app.goo.gl/h44P8eshKvWamjZX8" target="_blank" rel="noopener noreferrer" class="venue-map-link" aria-label="Open Uthralikkavu Bhagavathi Temple in Google Maps" title="View on map"><svg class="venue-map-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M4.12567 11.5257L3.66667 11.0667L10.3872 4.33333H4.19233V3.66667H11.5257V11H10.859V4.80517L4.12567 11.5257Z" fill="#AE1919"/></svg></a></span>
+                      <span class="wedding-venue-loc"><a href="https://maps.app.goo.gl/h44P8eshKvWamjZX8" target="_blank" rel="noopener noreferrer" class="venue-map-link venue-map-link--inline" aria-label="Open Uthralikkavu Bhagavathi Temple in Google Maps" title="View on map">UTHRALIKKAVU BHAGAVATHI TEMPLE<svg class="venue-map-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M4.12567 11.5257L3.66667 11.0667L10.3872 4.33333H4.19233V3.66667H11.5257V11H10.859V4.80517L4.12567 11.5257Z" fill="#AE1919"/></svg></a></span>
                     </div>
                     <div class="wedding-venue-item">
                       <span class="wedding-venue-time">10 AM ONWARDS</span>
-                      <span class="wedding-venue-name">THE RIVER RETREAT<a href="https://maps.app.goo.gl/Bk2B8TBugR6kkq2d9" target="_blank" rel="noopener noreferrer" class="venue-map-link" aria-label="Open The River Retreat in Google Maps" title="View on map"><svg class="venue-map-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M4.12567 11.5257L3.66667 11.0667L10.3872 4.33333H4.19233V3.66667H11.5257V11H10.859V4.80517L4.12567 11.5257Z" fill="#AE1919"/></svg></a></span>
+                      <span class="wedding-venue-name"><a href="https://maps.app.goo.gl/Bk2B8TBugR6kkq2d9" target="_blank" rel="noopener noreferrer" class="venue-map-link venue-map-link--inline" aria-label="Open The River Retreat in Google Maps" title="View on map">THE RIVER RETREAT, CHERUTHURUTHI, KERALA<svg class="venue-map-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M4.12567 11.5257L3.66667 11.0667L10.3872 4.33333H4.19233V3.66667H11.5257V11H10.859V4.80517L4.12567 11.5257Z" fill="#AE1919"/></svg></a></span>
                     </div>
                   </div>
                 </div>
@@ -2179,11 +2202,11 @@
               <div class="imob-venue" id="invMobVenue">
                 <div class="imob-venue-item">
                   <span class="imob-venue-time">9:15 AM THALIKEETU</span>
-                  <span class="imob-venue-loc">UTHRALIKKAVU BHAGAVATHI TEMPLE<a href="https://maps.app.goo.gl/h44P8eshKvWamjZX8" target="_blank" rel="noopener noreferrer" class="venue-map-link" aria-label="Open Uthralikkavu Bhagavathi Temple in Google Maps" title="View on map"><svg class="venue-map-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M4.12567 11.5257L3.66667 11.0667L10.3872 4.33333H4.19233V3.66667H11.5257V11H10.859V4.80517L4.12567 11.5257Z" fill="#AE1919"/></svg></a></span>
+                  <span class="imob-venue-loc"><a href="https://maps.app.goo.gl/h44P8eshKvWamjZX8" target="_blank" rel="noopener noreferrer" class="venue-map-link venue-map-link--inline" aria-label="Open Uthralikkavu Bhagavathi Temple in Google Maps" title="View on map">UTHRALIKKAVU BHAGAVATHI TEMPLE<svg class="venue-map-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M4.12567 11.5257L3.66667 11.0667L10.3872 4.33333H4.19233V3.66667H11.5257V11H10.859V4.80517L4.12567 11.5257Z" fill="#AE1919"/></svg></a></span>
                 </div>
                 <div class="imob-venue-item">
                   <span class="imob-venue-time">10 AM ONWARDS</span>
-                  <span class="imob-venue-name">THE RIVER RETREAT<a href="https://maps.app.goo.gl/Bk2B8TBugR6kkq2d9" target="_blank" rel="noopener noreferrer" class="venue-map-link" aria-label="Open The River Retreat in Google Maps" title="View on map"><svg class="venue-map-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M4.12567 11.5257L3.66667 11.0667L10.3872 4.33333H4.19233V3.66667H11.5257V11H10.859V4.80517L4.12567 11.5257Z" fill="#AE1919"/></svg></a></span>
+                  <span class="imob-venue-name"><a href="https://maps.app.goo.gl/Bk2B8TBugR6kkq2d9" target="_blank" rel="noopener noreferrer" class="venue-map-link venue-map-link--inline" aria-label="Open The River Retreat in Google Maps" title="View on map">THE RIVER RETREAT, CHERUTHURUTHI, KERALA<svg class="venue-map-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M4.12567 11.5257L3.66667 11.0667L10.3872 4.33333H4.19233V3.66667H11.5257V11H10.859V4.80517L4.12567 11.5257Z" fill="#AE1919"/></svg></a></span>
                 </div>
               </div>
 
